@@ -1,0 +1,5 @@
+name = "GodelCourse"
+defaultTargets = ["GodelCourse"]
+
+[[lean_lib]]
+name = "GodelCourse"
