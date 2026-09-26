@@ -12,7 +12,7 @@ export interface ChapterProgress {
   answers: Record<number, Answer>
 }
 
-const KEY = 'unprovable:v1:'
+const KEY = 'unprovable:v2:'
 const listeners = new Set<() => void>()
 const memo = new Map<string, ChapterProgress>()
 

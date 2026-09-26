@@ -32,7 +32,7 @@ for (const file of readdirSync(chapterDir).sort()) {
     ids.add(ch.id)
     let q = 0
     for (const b of walk(ch.blocks)) {
-      if (b.kind === 'snippet') {
+      if (b.kind === 'snippet' || b.kind === 'proof') {
         used.add(b.name)
         if (!snippets.has(b.name)) throw new Error(`unknown snippet "${b.name}"`)
       }

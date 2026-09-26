@@ -1,65 +1,70 @@
-import GodelCourse.Machines
+import GodelCourse.Recognize
 import GodelCourse.Basics
 
 /-!
-# Chapter 5: The halting problem
+# Chapter 6: The halting problem
 
 Turing's troll turns any would-be halting tester into a counterexample.
+Then, with Post's theorem: halting is recognizable, so looping is not.
 -/
 
 namespace Computer
 
-variable (M : Computer)
+variable {M : Computer}
 
 -- #snippet halts_on_self
 /-- Does program `x` halt when fed its own source code? -/
-def HaltsOnSelf (x : Code) : Prop := M.Halts x x
+def HaltsOnSelf (M : Computer) (x : Code) : Prop := M.Halts x x
 -- #end
 
--- #snippet has_troll
-/-- Our computer can build Turing's troll out of any program `d`:
-      function troll(x) {
-        if (d(x)) { while (true) {} }   // d says yes: loop forever
-        return true;                    // d says no: halt
-      }                                                          -/
-structure HasTroll where
-  troll : Code → Code
-  loops_if_yes : ∀ d x, M.run d x = .returns true  → M.run (troll d) x = .loops
-  halts_if_no  : ∀ d x, M.run d x = .returns false → M.run (troll d) x = .returns true
--- #end
-
--- #snippet halting_problem
-/-- No program decides whether programs halt on their own source. -/
-theorem halting_problem (T : M.HasTroll) :
-    ¬ ∃ d, M.Decides d M.HaltsOnSelf := by
-  intro ⟨d, hd⟩                         -- suppose d is a perfect tester
-  let t := T.troll d                    -- build the troll from d
-  by_cases h : M.HaltsOnSelf t          -- does the troll halt on itself?
-  · -- yes: then d says `true`, so the troll loops. Contradiction!
-    have loops : M.run t t = .loops := T.loops_if_yes d t ((hd t).1 h)
-    exact h loops
-  · -- no: then d says `false`, so the troll halts. Contradiction!
-    have halts : M.run t t = .returns true := T.halts_if_no d t ((hd t).2 h)
-    exact h (M.halts_of_returns halts)
+-- #snippet troll_def
+/-- Turing's troll, built from a would-be tester `d`: it asks `d` about its
+    input and does the opposite. It's exactly `haltIfNo d` from chapter 5:
+      function troll(x) { if (d(x)) while (true) {} }                    -/
+def troll (G : M.HasGuards) (d : Code) : Code := G.haltIfNo d
 -- #end
 
 -- #snippet troll_iff
-/-- The heart of it: if `d` decides `HaltsOnSelf`, the troll gives a liar. -/
-theorem troll_is_a_liar (T : M.HasTroll) (d : Code)
+/-- If `d` really decides `HaltsOnSelf`, the troll halts on itself
+    exactly when it doesn't. -/
+theorem troll_is_a_liar (G : M.HasGuards) (d : Code)
     (hd : M.Decides d M.HaltsOnSelf) :
-    M.HaltsOnSelf (T.troll d) ↔ ¬ M.HaltsOnSelf (T.troll d) := by
+    M.HaltsOnSelf (troll G d) ↔ ¬ M.HaltsOnSelf (troll G d) := by
   constructor
-  · intro h h'
-    exact h' (T.loops_if_yes d _ ((hd _).1 h))
-  · intro h
-    exact M.halts_of_returns (T.halts_if_no d _ ((hd _).2 h))
+  · -- if the troll halts on itself, d says "yes", so the troll loops
+    intro h h'
+    exact h' (G.haltIfNo_yes d _ ((hd _).1 h))
+  · -- if the troll loops on itself, d says "no", so the troll halts
+    intro h
+    exact G.haltIfNo_no d _ ((hd _).2 h)
 -- #end
 
--- #snippet halting_via_liar
-/-- The same theorem, in one line, straight from the liar lemma. -/
-theorem halting_problem' (T : M.HasTroll) :
-    ¬ ∃ d, M.Decides d M.HaltsOnSelf :=
-  fun ⟨d, hd⟩ => Basics.no_liar _ (M.troll_is_a_liar T d hd)
+-- #snippet halting_problem
+/-- The halting problem: no program decides whether programs halt on themselves. -/
+theorem halting_problem (G : M.HasGuards) : ¬ M.IsDecidable M.HaltsOnSelf :=
+  fun ⟨d, hd⟩ => Basics.no_liar _ (troll_is_a_liar G d hd)
+-- #end
+
+-- #snippet has_self_runner
+/-- Our computer has an interpreter that runs its input on itself:
+      function selfRun(x) { run(x, x) }                                   -/
+structure HasSelfRunner (M : Computer) where
+  selfRun : Code
+  selfRun_spec : ∀ x, M.Halts selfRun x ↔ M.Halts x x
+-- #end
+
+-- #snippet looping_not_recognizable
+/-- Halting is recognizable: just run it. -/
+theorem halting_recognizable (U : HasSelfRunner M) :
+    M.IsRecognizable M.HaltsOnSelf :=
+  ⟨U.selfRun, U.selfRun_spec⟩
+
+/-- So, by Post's theorem, looping can't be recognizable. -/
+theorem looping_not_recognizable (G : M.HasGuards) (R : M.HasRace)
+    (U : HasSelfRunner M) :
+    ¬ M.IsRecognizable (fun x => ¬ M.HaltsOnSelf x) := by
+  intro hloop
+  exact halting_problem G (decidable_of_both R (halting_recognizable U) hloop)
 -- #end
 
 end Computer

@@ -1,10 +1,14 @@
 # Unprovable! 🐍
 
-An interactive, code-first course on Gödel's incompleteness theorems, **proved in Lean**,
-one question at a time. Its style is modelled on [Busy Beavers!](https://busy-beavers.tigyog.app/).
+An interactive course on Gödel's incompleteness theorems: the mathematics explained step by step
+in plain English, illustrated with JavaScript, and **checked by Lean**. Its style is modelled on
+[Busy Beavers!](https://busy-beavers.tigyog.app/).
 
-* 11 chapters, 126 questions, 149 steps (about 3–4 hours)
-* Every Lean snippet in the course is cut from the verified Lean 4 project in [`lean/`](lean/)
+* 12 chapters, 153 questions, 177 steps (about 4 hours)
+* Every Lean snippet in the course is cut from the verified Lean 4 project in [`lean/`](lean/);
+  key definitions are shown, proofs are folded behind a toggle
+* Version history: `v1` (tag) was a Lean-syntax-heavy first version; `v2` refocuses on the
+  mathematics (see [`docs/OUTLINE-v2.md`](docs/OUTLINE-v2.md) and [`docs/REVIEW-v1.md`](docs/REVIEW-v1.md))
 * Progress is saved in the browser; works offline; light and dark themes
 
 ## Run it
@@ -33,7 +37,7 @@ npm run check:content  # every chapter parses, every snippet/figure exists
 
 | Path | What |
 |---|---|
-| `lean/GodelCourse/*.lean` | The proof: basics, diagonalization, machines, halting, enumeration, formal systems, Gödel, Rosser, second theorem |
+| `lean/GodelCourse/*.lean` | The proof: basics, diagonalization and Lawvere, machines, deciding/recognizing (Post's theorem), halting, enumeration, formal systems, Gödel, Rosser, second theorem |
 | `src/content/chapters/*.md` | Chapter text, in Markdown plus a few directives (see `src/lib/parse.ts`) |
 | `src/figures/` | Interactive figures (Cantor table, toy machine, string enumerator, race, ...) |
 | `src/components/`, `src/pages/` | React UI |
@@ -47,6 +51,7 @@ npm run check:content  # every chapter parses, every snippet/figure exists
 Markdown text, `inline code`, fenced ```lean / ```js blocks.
 
 @snippet godel_key        <!-- Lean code between `-- #snippet godel_key` and `-- #end` -->
+@proof godel_first        <!-- the same, but folded behind a "See the proof in Lean" button -->
 @figure race              <!-- an interactive figure -->
 
 ::: question
@@ -55,6 +60,10 @@ What does `g(g)` search for?
   Feedback shown when this is picked.
 - [x] The right option
   Feedback for the right answer.
+:::
+
+::: theorem Name
+A plain-English statement, in a highlighted box.
 :::
 
 ::: unlock Concept name

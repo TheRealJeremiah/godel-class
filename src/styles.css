@@ -694,6 +694,72 @@ h3 {
 
 /* ---------------- Callouts ---------------- */
 
+.theorem {
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 18px 2px;
+  margin: 8px 0 1.2em;
+  background: var(--bg-raised);
+  box-shadow: 0 2px 0 var(--line);
+}
+
+.theorem-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.theorem-kicker {
+  display: inline-block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--accent-soft);
+  border-radius: 5px;
+  padding: 1px 7px;
+  margin-right: 6px;
+  vertical-align: 2px;
+}
+
+.proof {
+  margin: 0 0 1.1em;
+}
+
+.proof-toggle {
+  font: inherit;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--code-bg);
+  border: 1.5px dashed var(--soft-line);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.proof-toggle:hover {
+  border-color: var(--muted);
+}
+
+.proof-toggle .check {
+  color: var(--good);
+  font-weight: 700;
+}
+
+.proof-toggle .chev {
+  color: var(--muted);
+  transition: transform 0.15s;
+}
+
+.proof.open .proof-toggle {
+  margin-bottom: 8px;
+}
+
+.proof.open .proof-toggle .chev {
+  transform: rotate(90deg);
+}
+
 .unlock {
   background: var(--unlock-bg);
   border: 2px solid var(--unlock-line);
@@ -987,7 +1053,7 @@ h3 {
 .hyp tbody th {
   text-align: left;
   font-weight: 500;
-  white-space: nowrap;
+  min-width: 190px;
 }
 
 .hyp td {
@@ -1349,4 +1415,129 @@ h3 {
     overflow-x: auto;
     font-size: 14.5px;
   }
+}
+
+/* ---------------- v2 figures ---------------- */
+
+.fp-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 4px;
+}
+
+.fp-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1.5px solid var(--soft-line);
+  border-radius: 8px;
+}
+
+.fp-cell.fixed {
+  border-color: var(--good);
+  background: var(--good-soft);
+}
+
+.fp-arrow {
+  color: var(--muted);
+}
+
+.fp-mark {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--good);
+}
+
+.lf-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 32px;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.lf-label {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.lf-all {
+  display: grid;
+  gap: 3px;
+  font-size: 14px;
+}
+
+.lf-row {
+  padding: 1px 8px;
+  border-radius: 6px;
+}
+
+.lf-row.in {
+  color: var(--good);
+}
+
+.lf-row.out {
+  color: var(--muted);
+}
+
+.lf-row.diag {
+  background: var(--accent-soft);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.diagram .region {
+  stroke: var(--line);
+  stroke-width: 2;
+  fill-opacity: 0.35;
+}
+
+.diagram .region.r1 {
+  fill: var(--good-soft);
+}
+
+.diagram .region.r2 {
+  fill: var(--accent-soft);
+}
+
+.diagram .strong {
+  font-weight: 700;
+}
+
+.dt-grid {
+  display: grid;
+  gap: 4px;
+  margin: 10px 0;
+}
+
+.dt-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.dt-x {
+  width: 60px;
+  flex: none;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.dt-track {
+  display: flex;
+  gap: 3px;
+}
+
+.dt-status {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.dt-out {
+  font-size: 15px;
+  margin-top: 6px;
 }

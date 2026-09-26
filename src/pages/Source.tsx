@@ -6,6 +6,7 @@ const ORDER = [
   'Basics',
   'Diagonal',
   'Machines',
+  'Recognize',
   'Halting',
   'Enumerate',
   'FormalSystems',

@@ -1,5 +1,12 @@
 # Unprovable! Research notes and curriculum design
 
+> **Version note.** This document was written for v1. v2 keeps the same research and proof
+> strategy but restructures the course around the mathematics: see
+> [OUTLINE-v2.md](OUTLINE-v2.md) for the v2 chapter plan, and [REVIEW-v1.md](REVIEW-v1.md) for
+> the gaps v2 addresses. The main v2 additions to the Lean development are Post's theorem
+> (`Recognize.lean`), "looping is not recognizable" (`Halting.lean`), a shorter take-one proof
+> built on it, and the Russell/"no list of all properties" instance of Lawvere's theorem.
+
 This document records the research behind the course: what it teaches, why it's in
 this order, which variant of Gödel's theorem it proves, and how the questions are designed.
 

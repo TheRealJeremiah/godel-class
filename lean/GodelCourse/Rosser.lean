@@ -1,7 +1,7 @@
 import GodelCourse.Incompleteness
 
 /-!
-# Chapter 9: Rosser's trick
+# Chapter 10: Rosser's trick
 
 Gödel's sentence needs more than consistency to be *unrefutable*.
 Rosser's program races a proof against a disproof, and needs only consistency.
@@ -57,28 +57,28 @@ theorem rosser (R : M.HasRace) (E : S.Effective)
     (hcon : S.Consistent) (hout : S.ProvesOutputs) :
     ¬ S.Provable (S.rosserSentence R E) ∧
     ¬ S.Provable (S.neg (S.rosserSentence R E)) := by
-  let ρ := S.rosserProgram R E
+  let ros := S.rosserProgram R E
   constructor
-  · intro hyes                             -- suppose S proves "ρ says true"
+  · intro hyes                             -- suppose S proves "ros says true"
     have hno : ¬ S.Provable (S.neg (S.rosserSentence R E)) :=
       fun hno => hcon _ ⟨hyes, hno⟩        -- consistency: no disproof
-    -- so only the proof search halts, and ρ returns false ...
-    have hrun : M.run ρ ρ = .returns false :=
-      R.right_wins _ _ ρ
-        (fun h => hno ((E.findNo_spec ρ).1 h))
-        ((E.findYes_spec ρ).2 hyes)
-    -- ... which S can check, disproving "ρ says true"
-    exact hno (hout ρ ρ false hrun).2
-  · intro hno                              -- suppose S proves "¬ ρ says true"
+    -- so only the proof search halts, and ros returns false ...
+    have hrun : M.run ros ros = .returns false :=
+      R.right_wins _ _ ros
+        (fun h => hno ((E.findNo_spec ros).1 h))
+        ((E.findYes_spec ros).2 hyes)
+    -- ... which S can check, disproving "ros says true"
+    exact hno (hout ros ros false hrun).2
+  · intro hno                              -- suppose S proves "¬ ros says true"
     have hyes : ¬ S.Provable (S.rosserSentence R E) :=
       fun hyes => hcon _ ⟨hyes, hno⟩       -- consistency: no proof
-    -- so only the disproof search halts, and ρ returns true ...
-    have hrun : M.run ρ ρ = .returns true :=
-      R.left_wins _ _ ρ
-        ((E.findNo_spec ρ).2 hno)
-        (fun h => hyes ((E.findYes_spec ρ).1 h))
-    -- ... which S can check, proving "ρ says true"
-    exact hyes (hout ρ ρ true hrun).1
+    -- so only the disproof search halts, and ros returns true ...
+    have hrun : M.run ros ros = .returns true :=
+      R.left_wins _ _ ros
+        ((E.findNo_spec ros).2 hno)
+        (fun h => hyes ((E.findYes_spec ros).1 h))
+    -- ... which S can check, proving "ros says true"
+    exact hyes (hout ros ros true hrun).1
 -- #end
 
 end RosserSystem

@@ -2,58 +2,34 @@ import GodelCourse.Halting
 import GodelCourse.FormalSystems
 
 /-!
-# Chapters 7–8: Gödel's first incompleteness theorem
+# Chapters 8–9: Gödel's first incompleteness theorem
 
-Take one: a complete, sound system would solve the halting problem.
+Take one: a complete, sound system would make looping recognizable.
 Take two: an explicit sentence that says "I am not provable".
 -/
-
-namespace Computer
-
-variable (M : Computer)
-
--- #snippet has_race
-/-- Our computer can race two programs, step by step, on the same input
-    and report which one finishes. (If both would finish we promise nothing.) -/
-structure HasRace where
-  race : Code → Code → Code
-  left_wins  : ∀ p q x, M.Halts p x → ¬ M.Halts q x →
-    M.run (race p q) x = .returns true
-  right_wins : ∀ p q x, ¬ M.Halts p x → M.Halts q x →
-    M.run (race p q) x = .returns false
--- #end
-
-end Computer
 
 namespace FormalSystem
 
 variable {M : Computer} (S : FormalSystem M)
 
 -- #snippet take_one
-/-- Take one: a sound, effective system can't be complete —
-    otherwise racing its proof searches would solve the halting problem. -/
-theorem incomplete_via_halting (T : M.HasTroll) (R : M.HasRace)
-    (E : S.Effective) (hsound : S.Sound) : ¬ S.Complete := by
+/-- Take one: a sound, effective system can't be complete. Otherwise its
+    search for "x loops on x" proofs would recognize looping. -/
+theorem incomplete_via_halting (G : M.HasGuards) (R : M.HasRace)
+    (U : Computer.HasSelfRunner M) (E : S.Effective) (hsound : S.Sound) :
+    ¬ S.Complete := by
   intro hcomplete
-  apply M.halting_problem T
-  -- the would-be halting tester:
-  refine ⟨R.race E.findHaltProof E.findLoopProof, fun x => ⟨?_, ?_⟩⟩
-  · intro hx                                  -- x halts on x
-    have no_loop_proof : ¬ S.Provable (S.neg (S.halts x x)) :=
-      fun h => (hsound x x).2 h hx
-    have halt_proof : S.Provable (S.halts x x) :=
-      (hcomplete _).resolve_right no_loop_proof
-    exact R.left_wins _ _ x
-      ((E.findHaltProof_spec x).2 halt_proof)
-      (fun h => no_loop_proof ((E.findLoopProof_spec x).1 h))
-  · intro hx                                  -- x loops on x
-    have no_halt_proof : ¬ S.Provable (S.halts x x) :=
-      fun h => hx ((hsound x x).1 h)
-    have loop_proof : S.Provable (S.neg (S.halts x x)) :=
-      (hcomplete _).resolve_left no_halt_proof
-    exact R.right_wins _ _ x
-      (fun h => no_halt_proof ((E.findHaltProof_spec x).1 h))
-      ((E.findLoopProof_spec x).2 loop_proof)
+  apply Computer.looping_not_recognizable G R U
+  refine ⟨E.findLoopProof, fun x => ?_⟩
+  -- we show: findLoopProof halts on x  ↔  x loops on x
+  rw [E.findLoopProof_spec x]
+  constructor
+  · -- a proof that x loops is true, by soundness
+    exact (hsound x x).2
+  · -- if x loops, S can't prove it halts (soundness),
+    -- so by completeness S proves that it loops
+    intro hloops
+    exact (hcomplete _).resolve_left (fun h => hloops ((hsound x x).1 h))
 -- #end
 
 -- #snippet godel_def
@@ -92,7 +68,7 @@ theorem godel_unprovable (E : S.Effective) (hsound : S.Sound) :
 -- #snippet godel_independent
 /-- Neither "g halts on g" nor its negation is provable in a sound system. -/
 theorem first_incompleteness_sound (E : S.Effective) (hsound : S.Sound) :
-    ∃ φ, ¬ S.Provable φ ∧ ¬ S.Provable (S.neg φ) := by
+    ∃ stmt, ¬ S.Provable stmt ∧ ¬ S.Provable (S.neg stmt) := by
   let g := S.godelProgram E
   refine ⟨S.halts g g, ?_, S.godel_unprovable E hsound⟩
   intro hprov                                    -- S proves "g halts on g"
@@ -112,7 +88,7 @@ theorem godel_first (E : S.Effective)
     intro hprov                                  -- S proves "g loops on g"
     have hhalts : M.Halts g g := (S.godel_key E).mpr hprov  -- so g halts on g
     have hprov2 : S.Provable (S.halts g g) := hph g g hhalts -- S confirms it
-    exact hcon _ ⟨hprov2, hprov⟩                 -- S proved φ and ¬ φ
+    exact hcon _ ⟨hprov2, hprov⟩                 -- S proved it and its negation
   exact ⟨unprovable, fun h => unprovable ((S.godel_key E).mp h)⟩
 -- #end
 

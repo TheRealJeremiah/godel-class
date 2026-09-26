@@ -1,7 +1,7 @@
-import GodelCourse.Machines
+import GodelCourse.Recognize
 
 /-!
-# Chapter 6: Formal systems
+# Chapter 7: Formal systems
 
 A formal system is anything that proves statements: Lean, ZFC, Peano arithmetic...
 We only need to know a few things about it.
@@ -14,7 +14,7 @@ structure FormalSystem (M : Computer) where
   Stmt : Type
   /-- Which statements it can prove. -/
   Provable : Stmt → Prop
-  /-- Negation: `neg φ` is the statement "not φ". -/
+  /-- Negation: `neg s` is the statement "not s". -/
   neg : Stmt → Stmt
   /-- `halts p x` is the statement "program p halts on input x". -/
   halts : Code → Code → Stmt
@@ -27,11 +27,11 @@ variable {M : Computer} (S : FormalSystem M)
 -- #snippet consistent_complete
 /-- Never proves a statement and its negation. -/
 def Consistent : Prop :=
-  ∀ φ, ¬ (S.Provable φ ∧ S.Provable (S.neg φ))
+  ∀ stmt, ¬ (S.Provable stmt ∧ S.Provable (S.neg stmt))
 
 /-- Proves or disproves every statement. -/
 def Complete : Prop :=
-  ∀ φ, S.Provable φ ∨ S.Provable (S.neg φ)
+  ∀ stmt, S.Provable stmt ∨ S.Provable (S.neg stmt)
 -- #end
 
 -- #snippet sound
@@ -48,21 +48,16 @@ def ProvesHalting : Prop :=
 -- #end
 
 -- #snippet effective
-/-- A program can search through all of S's proofs. Concretely, there are
-    two proof-searching programs:
-      findHaltProof(x):  halts iff S proves   "x halts on x"
-      findLoopProof(x):  halts iff S proves "¬ x halts on x"            -/
+/-- A program can search through S's proofs. In particular, this one:
+      findLoopProof(x): halts iff S proves "x doesn't halt on x"        -/
 structure Effective where
-  findHaltProof : Code
   findLoopProof : Code
-  findHaltProof_spec :
-    M.Recognizes findHaltProof (fun x => S.Provable (S.halts x x))
   findLoopProof_spec :
     M.Recognizes findLoopProof (fun x => S.Provable (S.neg (S.halts x x)))
 -- #end
 
 -- #snippet sound_consistent
-/-- A sound system (for halting statements) can't contradict itself about them. -/
+/-- A sound system can't contradict itself about halting. -/
 theorem sound_no_halting_contradiction (hs : S.Sound) (p x : Code) :
     ¬ (S.Provable (S.halts p x) ∧ S.Provable (S.neg (S.halts p x))) := by
   intro ⟨hyes, hno⟩

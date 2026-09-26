@@ -1,4 +1,5 @@
-import { useEffect, useState, type ComponentType } from 'react'
+import { useState, type ComponentType } from 'react'
+import { Race, HypothesisMap, FixedPoints, LawvereFinite, Landscape, LandscapeFull, Dovetail } from './more'
 
 /* ------------------------------------------------------------------ */
 /* Cantor's diagonal: click bits to change the table, watch diag move. */
@@ -252,127 +253,6 @@ function HaltingTable() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Racing two proof searches.                                          */
-
-function Race() {
-  const scenarios = [
-    { name: 'S proves “x halts on x”', left: 7, right: null },
-    { name: 'S proves “¬ x halts on x”', left: null, right: 11 },
-    { name: 'S proves neither', left: null, right: null },
-  ] as const
-  const [sc, setSc] = useState(0)
-  const [t, setT] = useState(0)
-  const s = scenarios[sc]
-  const leftDone = s.left !== null && t >= s.left
-  const rightDone = s.right !== null && t >= s.right
-  const over = leftDone || rightDone
-  useEffect(() => {
-    if (over || t >= 16) return
-    const id = setTimeout(() => setT(t + 1), 350)
-    return () => clearTimeout(id)
-  }, [t, over])
-  const lane = (label: string, target: number | null, done: boolean) => (
-    <div className="lane">
-      <div className="lane-label">{label}</div>
-      <div className="lane-track">
-        {Array.from({ length: 16 }, (_, k) => (
-          <span
-            key={k}
-            className={`tick ${k < t ? 'tried' : ''} ${target !== null && k === target - 1 && done ? 'found' : ''}`}
-          />
-        ))}
-      </div>
-    </div>
-  )
-  return (
-    <figure className="fig">
-      <div className="fig-controls">
-        {scenarios.map((x, i) => (
-          <button
-            key={i}
-            className={`chip ${i === sc ? 'on' : ''}`}
-            onClick={() => {
-              setSc(i)
-              setT(0)
-            }}
-          >
-            {x.name}
-          </button>
-        ))}
-      </div>
-      {lane('findHaltProof x', s.left, leftDone)}
-      {lane('findLoopProof x', s.right, rightDone)}
-      <figcaption>
-        Step {t}:{' '}
-        {leftDone ? (
-          <>
-            left search found a proof, so the race <strong>returns true</strong>.
-          </>
-        ) : rightDone ? (
-          <>
-            right search found a proof, so the race <strong>returns false</strong>.
-          </>
-        ) : t >= 16 ? (
-          <>… still searching. With no proof either way, the race runs forever.</>
-        ) : (
-          <>both searches try one more proof each…</>
-        )}{' '}
-        <button className="linkish" onClick={() => setT(0)}>
-          replay
-        </button>
-      </figcaption>
-    </figure>
-  )
-}
-
-/* ------------------------------------------------------------------ */
-/* Which theorem needs which hypothesis.                               */
-
-function HypothesisMap() {
-  const cols = ['Effective', 'Sound', 'Consistent', 'ProvesHalting / Outputs', 'HasTroll', 'HasRace']
-  const rows: [string, string, string[]][] = [
-    ['halting_problem', 'ch. 5', ['', '', '', '', '●', '']],
-    ['incomplete_via_halting', 'ch. 7', ['●', '●', '', '', '●', '●']],
-    ['first_incompleteness_sound', 'ch. 8', ['●', '●', '', '', '', '']],
-    ['godel_first', 'ch. 8', ['●', '', '●', '●', '', '']],
-    ['rosser', 'ch. 9', ['●', '', '●', '●', '', '●']],
-    ['second_incompleteness', 'ch. 10', ['●', '', '●', '●', '', '']],
-  ]
-  return (
-    <figure className="fig">
-      <div className="table-scroll">
-        <table className="hyp">
-          <thead>
-            <tr>
-              <th>theorem</th>
-              {cols.map((c) => (
-                <th key={c}>{c}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map(([name, ch, marks]) => (
-              <tr key={name}>
-                <th>
-                  <code>{name}</code> <span className="muted">{ch}</span>
-                </th>
-                {marks.map((m, i) => (
-                  <td key={i}>{m}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <figcaption>
-        Which assumptions each theorem uses. (<code>second_incompleteness</code> also assumes
-        <code> formalized_first</code>: that S can follow the proof of <code>godel_first</code>.)
-      </figcaption>
-    </figure>
-  )
-}
-
-/* ------------------------------------------------------------------ */
 /* g(g): a picture of the self-referential search.                      */
 
 function GodelLoop() {
@@ -420,5 +300,10 @@ export const figures: Record<string, ComponentType> = {
   'halting-table': HaltingTable,
   race: Race,
   'hypothesis-map': HypothesisMap,
+  'fixed-points': FixedPoints,
+  'lawvere-finite': LawvereFinite,
+  landscape: Landscape,
+  'landscape-full': LandscapeFull,
+  dovetail: Dovetail,
   'godel-loop': GodelLoop,
 }

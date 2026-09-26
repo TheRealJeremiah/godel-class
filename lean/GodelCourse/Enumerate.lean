@@ -1,5 +1,5 @@
 /-!
-# Chapter 6 (part): listing every proof
+# Chapter 7 (part): listing every proof
 
 Every proof is a string of bits, and we can list all bit strings.
 So a program can search through every proof, one by one.
@@ -47,17 +47,17 @@ variable {Stmt : Type} [DecidableEq Stmt]
 
 -- #snippet search
 /-- `check proof` returns the statement a proof proves, or `none` for nonsense. -/
-def ProvableBy (check : List Bool → Option Stmt) (φ : Stmt) : Prop :=
-  ∃ proof, check proof = some φ
+def ProvableBy (check : List Bool → Option Stmt) (stmt : Stmt) : Prop :=
+  ∃ proof, check proof = some stmt
 
-/-- Try the first `fuel` strings as proofs of `φ`. -/
-def searchUpTo (check : List Bool → Option Stmt) (φ : Stmt) : Nat → Bool
+/-- Try the first `fuel` strings as proofs of `stmt`. -/
+def searchUpTo (check : List Bool → Option Stmt) (stmt : Stmt) : Nat → Bool
   | 0        => false
-  | fuel + 1 => searchUpTo check φ fuel || check (nthString fuel) == some φ
+  | fuel + 1 => searchUpTo check stmt fuel || check (nthString fuel) == some stmt
 -- #end
 
-theorem searchUpTo_sound (check : List Bool → Option Stmt) (φ : Stmt) :
-    ∀ fuel, searchUpTo check φ fuel = true → ProvableBy check φ := by
+theorem searchUpTo_sound (check : List Bool → Option Stmt) (stmt : Stmt) :
+    ∀ fuel, searchUpTo check stmt fuel = true → ProvableBy check stmt := by
   intro fuel
   induction fuel with
   | zero => intro h; simp [searchUpTo] at h
@@ -70,11 +70,11 @@ theorem searchUpTo_sound (check : List Bool → Option Stmt) (φ : Stmt) :
 
 -- #snippet search_spec
 /-- Searching eventually succeeds exactly when a proof exists. -/
-theorem search_finds_proof (check : List Bool → Option Stmt) (φ : Stmt) :
-    (∃ fuel, searchUpTo check φ fuel = true) ↔ ProvableBy check φ := by
+theorem search_finds_proof (check : List Bool → Option Stmt) (stmt : Stmt) :
+    (∃ fuel, searchUpTo check stmt fuel = true) ↔ ProvableBy check stmt := by
   constructor
   · intro ⟨fuel, h⟩
-    exact searchUpTo_sound check φ fuel h
+    exact searchUpTo_sound check stmt fuel h
   · intro ⟨proof, hp⟩
     refine ⟨indexOf proof + 1, ?_⟩
     simp [searchUpTo, nthString_indexOf, hp]

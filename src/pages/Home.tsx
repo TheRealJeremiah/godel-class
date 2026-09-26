@@ -32,7 +32,9 @@ function ChapterCard({ i }: { i: number }) {
   )
 }
 
-const teaser = `-- Chapter 8, in one screen:
+const teaser = `-- Chapter 9, in one Lean statement. In English: if S is effective,
+-- consistent, and checks computations, then Gödel's sentence is
+-- unprovable in S, and true.
 theorem godel_first (E : S.Effective)
     (hcon : S.Consistent) (hph : S.ProvesHalting) :
     ¬ S.Provable (S.godelSentence E) ∧
@@ -52,36 +54,33 @@ export function Home() {
     <main className="home">
       <Hero />
       <h1 className="home-title">Unprovable!</h1>
-      <h2 className="home-sub">Gödel's incompleteness theorem, proved in Lean, one question at a time</h2>
+      <h2 className="home-sub">Gödel's incompleteness theorem, explained step by step, and checked by a computer</h2>
 
       <p>
-        In 1931, Kurt Gödel showed that any reasonable system for doing mathematics has statements it can
-        neither prove nor disprove. It's one of the most famous results in all of mathematics, and one of the
-        most misquoted. In this course, you and I will <em>actually prove it</em>, line by line, in the Lean
-        proof assistant.
+        In 1931, Kurt Gödel showed that any consistent formal system strong enough to talk about computer programs
+        has statements it can neither prove nor disprove. It's one of the most famous results in all of mathematics,
+        and one of the most misquoted. In this course we'll work through a complete proof of it, one idea at a time.
       </p>
       <p>
-        The only prerequisite is that you're comfortable reading code. No Lean experience needed: we'll
-        learn it as we go. I prefer <code>Provable φ</code> over squiggles like ⊢ φ, source-code strings over
-        Gödel numbering, and programs over arithmetic. We'll do examples first and abstraction later, and
-        you'll answer {questions} questions along the way to make sure every step really sinks in.
+        You'll need to be comfortable reading code and following a basic proof (by contradiction, or by induction).
+        You don't need to know anything about Gödel, the halting problem, or computability: we build all of that from
+        scratch. Every idea comes in plain English first, then a little JavaScript to make it concrete, and you'll
+        answer {questions} questions along the way to make sure each step really sinks in.
+      </p>
+      <p>
+        Behind the scenes, every theorem has been checked by the <strong>Lean</strong> proof assistant. You'll see the
+        key Lean definitions as we go; the Lean proofs are folded away, one click from the argument they check. You
+        never need to read them, but they're always there, and none of it is pseudo-code.
       </p>
 
       <div className="teaser" dangerouslySetInnerHTML={{ __html: highlight(teaser, 'lean') }} />
-
-      <p>
-        Every Lean snippet you'll see is cut straight from a real Lean 4 project that ships with this course.
-        None of it is pseudo-code, and Lean has checked all of it. The proof we'll build is the{' '}
-        <strong>computational</strong> version of Gödel's theorem, as told by Turing, Kleene and Rosser: a
-        system that could settle every question about programs would solve the halting problem.
-      </p>
 
       <div className="home-actions">
         <a className="btn primary big" href={`#/c/${chapters[0].id}`}>
           Start chapter 1 →
         </a>
         <span className="home-meta">
-          {chapters.length} chapters · {total} steps · about 3–4 hours
+          {chapters.length} chapters · {total} steps · about 4 hours
         </span>
       </div>
 
@@ -95,22 +94,24 @@ export function Home() {
       <h2 className="home-h">The plan, in one picture</h2>
       <ol className="roadmap">
         <li>
-          <strong>Learn to read Lean</strong> (ch. 1–2). Statements are types, proofs are programs.
+          <strong>Formal systems</strong> (ch. 1). Axioms, proofs, checkers, and the gap between <em>true</em> and{' '}
+          <em>provable</em>.
         </li>
         <li>
-          <strong>Learn the one trick</strong> (ch. 3). Diagonalization: to escape a list, disagree with row{' '}
-          <code>n</code> at position <code>n</code>.
+          <strong>The one trick</strong> (ch. 2–3). Cantor's diagonal argument, and Lawvere's theorem that explains
+          why the liar, Russell's paradox and Cantor are all the same argument.
         </li>
         <li>
-          <strong>Aim the trick at programs</strong> (ch. 4–5). No program can decide halting.
+          <strong>Aim it at programs</strong> (ch. 4–6). Deciding versus recognizing, Post's theorem, and Turing's
+          halting problem. Conclusion: no program can even recognize the programs that loop.
         </li>
         <li>
-          <strong>Aim it at proofs</strong> (ch. 6–8). Proofs can be listed, so a complete system would decide
-          halting. Then build the sentence that says “I am not provable”.
+          <strong>Aim it at proofs</strong> (ch. 7–9). A formal system's proofs can be searched by a program, so it
+          can't settle every question about looping. Then Gödel's sentence: "I am not provable".
         </li>
         <li>
-          <strong>Sharpen it</strong> (ch. 9–11). Rosser's trick, the second incompleteness theorem, and what it
-          all means for Lean itself.
+          <strong>Sharpen it</strong> (ch. 10–12). Rosser's trick, the second incompleteness theorem, and what it all
+          means for mathematics and for Lean itself.
         </li>
       </ol>
 

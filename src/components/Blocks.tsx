@@ -24,6 +24,24 @@ export function Snippet({ name }: { name: string }) {
   )
 }
 
+function Proof({ name, label }: { name: string; label: string }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className={`proof ${open ? 'open' : ''}`}>
+      <button className="proof-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>
+        <span className="check" aria-hidden>
+          ✓
+        </span>
+        {open ? 'Hide the Lean proof' : label}
+        <span className="chev" aria-hidden>
+          ▸
+        </span>
+      </button>
+      {open && <Snippet name={name} />}
+    </div>
+  )
+}
+
 function Aside({ title, body }: { title: string; body: Block[] }) {
   const [open, setOpen] = useState(false)
   return (
@@ -59,6 +77,17 @@ export function Blocks({ blocks }: { blocks: Block[] }) {
             )
           case 'snippet':
             return <Snippet key={i} name={b.name} />
+          case 'proof':
+            return <Proof key={i} name={b.name} label={b.label} />
+          case 'theorem':
+            return (
+              <div key={i} className="theorem">
+                <div className="theorem-title">
+                  <span className="theorem-kicker">Theorem</span> {b.title}
+                </div>
+                <Blocks blocks={b.body} />
+              </div>
+            )
           case 'figure': {
             const F = figures[b.name]
             return F ? <F key={i} /> : <div key={i} className="error">Missing figure “{b.name}”</div>

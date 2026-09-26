@@ -1,5 +1,7 @@
+import GodelCourse.Basics
+
 /-!
-# Chapter 3: Diagonalization
+# Chapters 2–3: Diagonalization and Lawvere's fixed-point theorem
 
 Cantor's trick: flip the diagonal of any table to get a row that is not in it.
 Lawvere's fixed point theorem packages the trick once and for all.
@@ -43,6 +45,16 @@ theorem cantor_again {A : Type} (e : A → A → Bool) :
   intro every_row
   obtain ⟨b, hb⟩ := lawvere e every_row (fun b => !b)
   cases b <;> simp at hb
+-- #end
+
+-- #snippet no_property_list
+/-- Negation has no fixed point either (that's the liar lemma), so no table
+    lists every property of `A`s. This is the shape of Russell's paradox. -/
+theorem no_list_of_all_properties {A : Type} (e : A → A → Prop) :
+    ¬ ∀ P : A → Prop, ∃ a, e a = P := by
+  intro every_row
+  obtain ⟨b, hb⟩ := lawvere e every_row Not     -- hb : ¬ b = b
+  exact Basics.no_liar b (by rw [hb])           -- so b ↔ ¬ b, impossible
 -- #end
 
 end Diagonal

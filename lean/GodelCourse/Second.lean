@@ -1,17 +1,18 @@
 import GodelCourse.Incompleteness
 
 /-!
-# Chapter 10: The second incompleteness theorem
+# Chapter 11: The second incompleteness theorem
 
 If S can follow our proof of the first theorem, S can't prove it is consistent.
 -/
 
 -- #snippet logical_system
-/-- A formal system with implication, modus ponens,
-    and a sentence `Con` that says "S is consistent". -/
+/-- A formal system with implication, modus ponens, and a sentence `Con`.
+    `Con` is *meant* to say "S is consistent", but Lean doesn't know that:
+    its meaning enters only through the `formalized_first` assumption below. -/
 structure LogicalSystem (M : Computer) extends FormalSystem M where
   imp : Stmt → Stmt → Stmt
-  modus_ponens : ∀ φ ψ, Provable (imp φ ψ) → Provable φ → Provable ψ
+  modus_ponens : ∀ a b, Provable (imp a b) → Provable a → Provable b
   Con : Stmt
 -- #end
 

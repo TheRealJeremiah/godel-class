@@ -3,6 +3,7 @@
  *
  *   ## Heading                      section heading (appears in the chapter TOC)
  *   @snippet name                   a Lean snippet, verified by `lake build`
+ *   @proof name [Button label]      a Lean snippet, collapsed behind a button
  *   @figure name                    an interactive figure (see src/figures)
  *   [[Button label]]                a "continue" gate
  *   ::: question                    a multiple-choice gate:
@@ -10,17 +11,20 @@
  *   - [x] correct option              [x] correct, [ ] wrong, [~] neither
  *     Feedback markdown (indented)
  *   :::
- *   ::: aside Title  / ::: unlock Title / ::: note   (containers, closed by :::)
+ *   ::: aside Title  / ::: unlock Title / ::: note / ::: theorem Title
+ *                                   (containers, closed by :::)
  */
 
 export type Block =
   | { kind: 'md'; src: string }
   | { kind: 'heading'; text: string; slug: string }
   | { kind: 'snippet'; name: string }
+  | { kind: 'proof'; name: string; label: string }
   | { kind: 'figure'; name: string }
   | { kind: 'aside'; title: string; body: Block[] }
   | { kind: 'unlock'; title: string; body: Block[] }
   | { kind: 'note'; body: Block[] }
+  | { kind: 'theorem'; title: string; body: Block[] }
   | { kind: 'continue'; label: string; gate: number }
   | { kind: 'question'; prompt: Block[]; options: Option[]; gate: number }
 
@@ -99,6 +103,9 @@ function parseBlocks(lines: string[], ctx: Ctx): Block[] {
     } else if ((m = line.match(/^@snippet\s+(\S+)\s*$/))) {
       flush()
       blocks.push({ kind: 'snippet', name: m[1] })
+    } else if ((m = line.match(/^@proof\s+(\S+)\s*(.*)$/))) {
+      flush()
+      blocks.push({ kind: 'proof', name: m[1], label: m[2].trim() || 'See the proof in Lean' })
     } else if ((m = line.match(/^@figure\s+(\S+)\s*$/))) {
       flush()
       blocks.push({ kind: 'figure', name: m[1] })
@@ -129,6 +136,8 @@ function parseBlocks(lines: string[], ctx: Ctx): Block[] {
         blocks.push({ kind: 'unlock', title, body: parseBlocks(body, inner) })
       } else if (type === 'note') {
         blocks.push({ kind: 'note', body: parseBlocks(body, inner) })
+      } else if (type === 'theorem') {
+        blocks.push({ kind: 'theorem', title, body: parseBlocks(body, inner) })
       } else {
         throw new Error(`${ctx.where}: unknown container ::: ${type}`)
       }
@@ -195,7 +204,8 @@ export function parseChapter(src: string, where = 'chapter'): Chapter {
 export function* walk(blocks: Block[]): Generator<Block> {
   for (const b of blocks) {
     yield b
-    if (b.kind === 'aside' || b.kind === 'unlock' || b.kind === 'note') yield* walk(b.body)
+    if (b.kind === 'aside' || b.kind === 'unlock' || b.kind === 'note' || b.kind === 'theorem')
+      yield* walk(b.body)
     if (b.kind === 'question') {
       yield* walk(b.prompt)
       for (const o of b.options) yield* walk(o.feedback)

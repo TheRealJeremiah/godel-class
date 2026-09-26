@@ -1,70 +1,83 @@
 import { Markdown } from '../components/Blocks'
 
 const sheet = `
-# Lean cheat sheet 📋
+# Reading Lean 📋
 
-Everything you need to read the proofs in this course.
+You never need to *write* Lean in this course. This page is for *reading* the definitions and
+statements we show, and for peeking into the folded proofs if you're curious.
 
-## Statements and their proofs
+## Symbols
 
-| Statement | Read it as | A proof is ... | In code terms |
-|---|---|---|---|
-| \`P ∧ Q\` | P and Q | \`⟨hp, hq⟩\` | a pair \`[hp, hq]\` |
-| \`P ∨ Q\` | P or Q | \`Or.inl hp\` or \`Or.inr hq\` | a tagged union |
-| \`P → Q\` | if P then Q | \`fun hp => ...\` | a function from P-proofs to Q-proofs |
-| \`¬ P\` | not P | \`fun hp => ...\` producing \`False\` | a function \`P → False\` |
-| \`P ↔ Q\` | P iff Q | \`⟨mp, mpr⟩\` | two functions, \`.mp : P → Q\` and \`.mpr : Q → P\` |
-| \`∃ x, P x\` | some x has P | \`⟨x, hx⟩\` | an object \`{ witness, evidence }\` |
-| \`∀ x, P x\` | every x has P | \`fun x => ...\` | a function from any \`x\` to a proof of \`P x\` |
-| \`False\` | contradiction | (none!) | an empty type: \`never\` |
+| Lean | Read it as | Example |
+|---|---|---|
+| \`¬ P\` | not P | \`¬ M.Halts p x\`: p doesn't halt on x |
+| \`P ∧ Q\` | P and Q | |
+| \`P ∨ Q\` | P or Q | \`S.Provable s ∨ S.Provable (S.neg s)\` |
+| \`P → Q\` | if P then Q | |
+| \`P ↔ Q\` | P if and only if Q | \`M.Halts g g ↔ S.Provable G\` |
+| \`∀ x, P x\` | for every x, P x | |
+| \`∃ x, P x\` | there is an x with P x | \`∃ fuel, runFor f fuel s = 0\` |
+| \`a ≠ b\` | a is not equal to b | |
+| \`f x y\` | the function f applied to x and y, like \`f(x, y)\` | \`M.run p x\` |
+| \`fun x => e\` | an anonymous function, like \`x => e\` | |
 
-## Using a proof you already have
+## Reading a definition
 
-| You have | You can |
+\`\`\`lean
+def Halts (p x : Code) : Prop := M.run p x ≠ .loops
+\`\`\`
+
+"\`Halts\` takes two pieces of code \`p\` and \`x\`, and gives a statement (a \`Prop\`): the
+statement that running \`p\` on \`x\` doesn't loop." A \`Prop\` is a statement that may be true or false.
+
+A \`structure\` is like a TypeScript interface: a bundle of named fields. In this course, some
+fields are *promises* (statements that must be proved), so a structure like \`HasRace\` means
+"a way to build \`race p q\`, **together with** proofs that it behaves as described".
+
+## Reading a theorem
+
+\`\`\`lean
+theorem godel_first (E : S.Effective) (hcon : S.Consistent) (hph : S.ProvesHalting) :
+    ¬ S.Provable (S.godelSentence E) ∧ ¬ M.Halts (S.godelProgram E) (S.godelProgram E)
+\`\`\`
+
+Everything in parentheses before the \`:\` is an **assumption**. Everything after it is the
+**conclusion**. So: "Assume S is effective, consistent, and checks computations. Then S doesn't
+prove the Gödel sentence, and the Gödel program doesn't halt on itself." Assumption names that start
+with \`h\` (like \`hcon\`) are just labels for the assumptions, used inside the proof.
+
+## Inside a folded proof
+
+Proofs are written as a sequence of steps. You can usually follow them from the comments. A few
+common words:
+
+| Step | Meaning |
 |---|---|
-| \`h : P ∧ Q\` | \`h.1 : P\`, \`h.2 : Q\` |
-| \`h : P ↔ Q\` | \`h.mp : P → Q\`, \`h.mpr : Q → P\` |
-| \`h : P → Q\` and \`hp : P\` | \`h hp : Q\` |
-| \`h : ¬ P\` and \`hp : P\` | \`h hp : False\` |
-| \`h : P ∨ Q\` and \`hnq : ¬ Q\` | \`h.resolve_right hnq : P\` |
-| \`h : ∃ x, P x\` | \`obtain ⟨x, hx⟩ := h\` |
-| \`h : f = g\` (functions) | \`congrFun h n : f n = g n\` |
+| \`intro h\` | "Suppose ... (call it h)." |
+| \`have h : P := ...\` | "We know P, because ..." |
+| \`exact ...\` | "This finishes the proof." |
+| \`by_cases h : P\` | "Either P holds, or it doesn't. Case 1: ... Case 2: ..." |
+| \`constructor\` | "We prove both halves separately." |
+| \`obtain ⟨x, hx⟩ := h\` | "Take the x that h says exists." |
+| \`h.mp\` / \`h.mpr\` | The two directions of an if-and-only-if \`h\` |
+| \`h.1\` / \`h.2\` | The two parts of an "and" \`h\` |
+| \`rfl\`, \`decide\`, \`simp\`, \`omega\` | "By computation / simplification." |
 
-## Tactics used in this course
+## The course's definitions
 
-| Tactic | What it does |
-|---|---|
-| \`intro h\` | Goal \`P → Q\` (or \`¬ P\`): assume \`h : P\`, now prove \`Q\` (or \`False\`) |
-| \`exact e\` | Close the goal with the proof term \`e\` |
-| \`have h : P := e\` | Prove a fact \`P\` and remember it as \`h\` |
-| \`by_cases h : P\` | Split into two cases, \`h : P\` and \`h : ¬ P\` |
-| \`constructor\` | Split a goal \`P ∧ Q\` or \`P ↔ Q\` into its two halves |
-| \`refine ⟨a, ?_, ?_⟩\` | Supply part of a proof, leaving the \`?_\` holes as new goals |
-| \`obtain ⟨x, hx⟩ := h\` | Unpack an \`∃\` or \`∧\` |
-| \`apply f\` | Goal is \`Q\` and \`f : P → Q\`: now prove \`P\` |
-| \`rw [h] at h'\` | Rewrite with an equation \`h\`, inside \`h'\` |
-| \`contradiction\` | Close the goal if the hypotheses are obviously contradictory |
-| \`rfl\` | Close \`a = a\`, computing if needed |
-| \`decide\` | Settle a small, checkable claim by computing it |
-| \`simp\` | Simplify with a large set of known rewrite rules |
-| \`omega\` | Solve linear arithmetic over \`Nat\` and \`Int\` |
-| \`induction n with ...\` | Proof by induction |
-| \`·\` | Focus on the next goal |
-
-## The course's own definitions
-
-| Name | Meaning |
-|---|---|
-| \`M.run p x\` | What program \`p\` does on input \`x\`: \`.loops\` or \`.returns b\` |
-| \`M.Halts p x\` | \`M.run p x ≠ .loops\` |
-| \`M.Decides d P\` | \`d\` always halts, returning \`true\` exactly on inputs with \`P\` |
-| \`M.Recognizes r P\` | \`r\` halts exactly on inputs with \`P\` |
-| \`S.Provable φ\` | The system \`S\` proves \`φ\` |
-| \`S.Consistent\` | Never proves both \`φ\` and \`S.neg φ\` |
-| \`S.Complete\` | Always proves \`φ\` or \`S.neg φ\` |
-| \`S.Sound\` | Never proves a false halting statement |
-| \`S.ProvesHalting\` | Proves every true "p halts on x" |
-| \`S.Effective\` | A program can search S's proofs |
+| Name | Meaning | Chapter |
+|---|---|---|
+| \`M.run p x\` | What program \`p\` does on input \`x\`: \`.loops\` or \`.returns b\` | 4 |
+| \`M.Halts p x\` | \`p\` doesn't loop on \`x\` | 4 |
+| \`M.Decides d P\` | \`d\` always halts, answering \`true\` exactly on inputs with property \`P\` | 5 |
+| \`M.Recognizes r P\` | \`r\` halts exactly on inputs with property \`P\` | 5 |
+| \`HasGuards\`, \`HasRace\`, \`HasSelfRunner\` | The computer can wrap a program in an if-and-loop, race two programs, and run a program on itself | 5–6 |
+| \`S.Provable s\` | The formal system \`S\` proves statement \`s\` | 7 |
+| \`S.Consistent\` | \`S\` never proves both \`s\` and \`S.neg s\` | 7 |
+| \`S.Complete\` | \`S\` always proves \`s\` or \`S.neg s\` | 7 |
+| \`S.Sound\` | \`S\` never proves a false halting statement | 7 |
+| \`S.ProvesHalting\` | \`S\` checks computations: it proves every true "p halts on x" | 7 |
+| \`S.Effective\` | A program can search \`S\`'s proofs of "x loops on x" | 7 |
 `
 
 export function Cheatsheet() {

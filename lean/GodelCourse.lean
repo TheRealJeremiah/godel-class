@@ -1,6 +1,7 @@
 import GodelCourse.Basics
 import GodelCourse.Diagonal
 import GodelCourse.Machines
+import GodelCourse.Recognize
 import GodelCourse.Halting
 import GodelCourse.Enumerate
 import GodelCourse.FormalSystems

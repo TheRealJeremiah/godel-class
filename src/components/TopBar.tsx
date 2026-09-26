@@ -135,7 +135,7 @@ export function TopBar({ progress, headings }: Props) {
             ))}
             <div className="drawer-section">Reference</div>
             <a className="drawer-link" href="#/cheatsheet">
-              Lean cheat sheet 📋
+              Reading Lean 📋
             </a>
             <a className="drawer-link" href="#/glossary">
               Glossary of translated words 📖
