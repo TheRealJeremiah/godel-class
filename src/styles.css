@@ -720,45 +720,7 @@ h3 {
   vertical-align: 2px;
 }
 
-.proof {
-  margin: 0 0 1.1em;
-}
 
-.proof-toggle {
-  font: inherit;
-  font-size: 15px;
-  color: var(--text);
-  background: var(--code-bg);
-  border: 1.5px dashed var(--soft-line);
-  border-radius: 8px;
-  padding: 6px 12px;
-  cursor: pointer;
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.proof-toggle:hover {
-  border-color: var(--muted);
-}
-
-.proof-toggle .check {
-  color: var(--good);
-  font-weight: 700;
-}
-
-.proof-toggle .chev {
-  color: var(--muted);
-  transition: transform 0.15s;
-}
-
-.proof.open .proof-toggle {
-  margin-bottom: 8px;
-}
-
-.proof.open .proof-toggle .chev {
-  transform: rotate(90deg);
-}
 
 .unlock {
   background: var(--unlock-bg);
@@ -780,38 +742,100 @@ h3 {
   margin: 0 0 1.2em;
 }
 
-.aside {
-  margin: 0 0 1em;
+.aside,
+.proof {
+  margin: 0 0 1.1em;
 }
 
-.aside-toggle {
-  font: inherit;
-  font-weight: 600;
-  color: var(--text);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px 0;
+/* Expandable content (asides and folded Lean proofs): styled to look clickable. */
+.disclosure {
   display: flex;
-  gap: 8px;
-  align-items: baseline;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  font: inherit;
+  font-size: 16.5px;
   text-align: left;
+  color: var(--text);
+  background: var(--bg-raised);
+  border: 1.5px solid var(--soft-line);
+  border-radius: 10px;
+  padding: 9px 14px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
-.aside-toggle .chev {
-  display: inline-block;
-  transition: transform 0.15s;
+.disclosure:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent-soft) 45%, var(--bg-raised));
+}
+
+.disclosure:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.disc-icon {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.disc-icon.check {
+  background: var(--good-soft);
+  color: var(--good);
+}
+
+.disc-label {
+  flex: 1;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.disc-hint {
+  flex: none;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--muted);
+  white-space: nowrap;
 }
 
-.aside.open .chev {
-  transform: rotate(90deg);
+.disclosure:hover .disc-hint {
+  color: var(--text);
 }
 
-.aside-body {
-  border-left: 3px solid var(--soft-line);
-  padding: 6px 0 2px 16px;
-  margin: 4px 0 0 4px;
+.open > .disclosure {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-color: var(--accent);
+}
+
+.disc-body {
+  border: 1.5px solid var(--accent);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 14px 16px 2px;
+  background: var(--bg-raised);
+  animation: reveal 0.25s ease both;
+}
+
+.proof .disc-body {
+  padding: 10px;
+}
+
+.proof .disc-body .snippet {
+  margin: 0;
 }
 
 .error {
@@ -1540,4 +1564,85 @@ h3 {
 .dt-out {
   font-size: 15px;
   margin-top: 6px;
+}
+
+.fo-grid {
+  display: grid;
+  grid-template-columns: minmax(70px, 0.6fr) 1fr 1fr;
+  gap: 8px;
+  font-size: 14.5px;
+}
+
+.fo-head,
+.fo-side {
+  color: var(--muted);
+  font-size: 13.5px;
+  display: flex;
+  align-items: center;
+}
+
+.fo-head {
+  justify-content: center;
+  text-align: center;
+}
+
+.fo-cell {
+  border: 2px solid var(--soft-line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: var(--bg);
+}
+
+.fo-cell.gap {
+  border-style: dashed;
+}
+
+.fo-cell.bad {
+  border-color: var(--bad);
+  background: var(--bad-soft);
+}
+
+.fo-cell.ok {
+  border-color: var(--good);
+}
+
+.fo-title {
+  font-weight: 700;
+}
+
+.fo-body {
+  margin: 2px 0 6px;
+  line-height: 1.4;
+}
+
+.fo-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.fo-tag {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+
+.fo-tag.consistent {
+  background: var(--bad-soft);
+  color: var(--bad);
+  border: 1px solid var(--bad);
+}
+
+.fo-tag.complete {
+  background: var(--note-bg);
+  color: var(--neutral);
+  border: 1px solid var(--neutral);
+}
+
+.fo-tag.sound {
+  background: var(--good-soft);
+  color: var(--good);
+  border: 1px solid var(--good);
 }

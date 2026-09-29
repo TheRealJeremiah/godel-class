@@ -247,6 +247,45 @@ export function Dovetail() {
 }
 
 /* ------------------------------------------------------------------ */
+/* The four outcomes for a statement: which property rules out which.  */
+
+export function FourOutcomes() {
+  const cell = (title: string, body: string, tags: [string, string][], tone: string) => (
+    <div className={`fo-cell ${tone}`}>
+      <div className="fo-title">{title}</div>
+      <div className="fo-body">{body}</div>
+      <div className="fo-tags">
+        {tags.map(([k, t]) => (
+          <span key={t} className={`fo-tag ${k}`}>
+            {t}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+  return (
+    <figure className="fig">
+      <div className="fo-grid">
+        <div />
+        <div className="fo-head">doesn't prove <code>neg s</code></div>
+        <div className="fo-head">proves <code>neg s</code></div>
+        <div className="fo-side">doesn't prove <code>s</code></div>
+        {cell('Neither', 'A blank: the question is left unanswered.', [['complete', 'ruled out by COMPLETE']], 'gap')}
+        {cell('Only neg s', 'Fine, as long as neg s is the true one.', [['sound', 'SOUND: must be true']], 'ok')}
+        <div className="fo-side">proves <code>s</code></div>
+        {cell('Only s', 'Fine, as long as s is the true one.', [['sound', 'SOUND: must be true']], 'ok')}
+        {cell('Both', 'A contradiction: one of them must be false.', [['consistent', 'ruled out by CONSISTENT'], ['sound', 'and by SOUND']], 'bad')}
+      </div>
+      <figcaption>
+        For one statement <code>s</code>, a system lands in exactly one of these four cells. <strong>Consistent</strong> means
+        never "both", <strong>complete</strong> means never "neither", and <strong>sound</strong> means that whichever one it
+        proves is true.
+      </figcaption>
+    </figure>
+  )
+}
+
+/* ------------------------------------------------------------------ */
 /* Racing two recognizers.                                             */
 
 export function Race() {

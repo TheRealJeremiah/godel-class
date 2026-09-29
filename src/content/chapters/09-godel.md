@@ -198,6 +198,16 @@ What would `g(g)` do if `S` were **inconsistent**?
   An inconsistent `S` proves every statement, so there *is* a proof for `g(g)` to find.
 :::
 
+::: question
+Think back to the four outcomes from chapter 7 (proves `s` only, proves its negation only, both, neither). For a consistent `S`, which outcome does the Gödel sentence land in?
+- [ ] "Both": `S` proves it and its negation
+  That would make `S` inconsistent, and we assumed it's consistent.
+- [ ] "Only the sentence": `S` proves it
+  Step 1 showed `S` can't prove it.
+- [x] Not the sentence itself: either "neither", or "only the negation" (a false proof)
+  Right. `S` can't prove the Gödel sentence. If `S` is also sound, it can't prove the (false) negation either, so the sentence sits in the "neither" cell: a blank, so `S` is **incomplete**. With consistency alone, `S` might wrongly prove the negation instead. That's the gap Rosser closes in chapter 10.
+:::
+
 ::: unlock Gödel's first incompleteness theorem
 If `S` is consistent, effective, and checks computations, then "`g(g)` doesn't halt" is true but unprovable in `S`, where `g` searches for proofs that its input loops on itself.
 :::

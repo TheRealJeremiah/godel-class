@@ -15,11 +15,12 @@ most of its pages doing this. We skip it by giving our formal system a built-in 
 also has a handful of "axioms" in a different sense: basic logical principles like the law of excluded
 middle, which Lean can list for any theorem.)
 
-**Complete**, *adj.* A system is complete if for every statement \`φ\`, it proves \`φ\` or proves \`S.neg φ\`.
-In Lean: \`def Complete := ∀ φ, S.Provable φ ∨ S.Provable (S.neg φ)\`. Nothing to do with Gödel's
+**Complete**, *adj.* A system is complete if for every statement \`s\`, it proves \`s\` or proves \`S.neg s\`:
+it never leaves a question unanswered. In Lean: \`def Complete := ∀ stmt, S.Provable stmt ∨ S.Provable (S.neg stmt)\`. Nothing to do with Gödel's
 *completeness* theorem, which is about something else entirely.
 
-**Consistent**, *adj.* Never proves both \`φ\` and \`S.neg φ\`.
+**Consistent**, *adj.* Never proves both \`s\` and \`S.neg s\`: it never contradicts itself.
+Compare **sound** (never wrong) and **complete** (never leaves a question unanswered). (Chapter 7.)
 
 **Decidable** (also *recursive*, *computable*), *adj.* A property \`P\` is decidable if some program
 is a bug-free tester for it: it always halts, answering \`true\` exactly on the inputs with property \`P\`.
@@ -33,11 +34,11 @@ talks about itself. We get self-reference more cheaply, by running a program on 
 
 **Diverge**, *v.* To loop forever. In Lean: \`M.run p x = .loops\`.
 
-**Effectively axiomatized** (also *recursively axiomatizable*), *adj.* A program can check proofs, so a
-program can search through all proofs. In Lean: the structure \`S.Effective\`. (Chapter 7.)
-
 **Dovetailing**, *n.* Running more and more inputs for more and more steps, so that no input that
 loops forever can block the others. It turns a recognizer into a lister. (Chapter 5.)
+
+**Effectively axiomatized** (also *recursively axiomatizable*), *adj.* A program can check proofs, so a
+program can search through all proofs. In Lean: the structure \`S.Effective\`. (Chapter 7.)
 
 **Fixed point**, *n.* An input a function leaves unchanged: \`f(x) = x\`. Flipping a bit has none, and
 that's what powers Cantor's argument. (Chapter 3.)
@@ -46,15 +47,15 @@ that's what powers Cantor's argument. (Chapter 3.)
 mechanical checker that says which proofs prove which statements. Lean, Peano arithmetic and ZFC are
 all formal systems.
 
-**Lawvere's fixed-point theorem**, *n.* If a table (with matching row and column labels) contains every
-possible row, then every function on its entries has a fixed point. Cantor, Russell, the liar and the
-halting problem are all instances. (Chapter 3.)
-
 **Gödel numbering**, *n.* Gödel's trick for turning formulas and proofs into numbers so that arithmetic
 could talk about them. Nowadays we just use source code strings.
 
 **Independent**, *adj.* A statement is independent of a system if the system can neither prove it nor
 disprove it.
+
+**Lawvere's fixed-point theorem**, *n.* If a table (with matching row and column labels) contains every
+possible row, then every function on its entries has a fixed point. Cantor, Russell, the liar and the
+halting problem are all instances. (Chapter 3.)
 
 **ω-consistent** (*omega-consistent*), *adj.* Gödel's original extra assumption, used to show his
 sentence can't be *disproved*. It implies the property we'd need: "never proves that a program halts
@@ -73,10 +74,10 @@ the rest). In Lean: \`∃ r, M.Recognizes r P\`. Equivalently, a program can lis
 **Σ₁-complete** (*sigma-one complete*), *adj.* Proves every true statement of the form "this search
 eventually finds something", which includes every true "program \`p\` halts". In Lean: \`S.ProvesHalting\`.
 
-**Sound**, *adj.* Only proves true things. We only need soundness for halting statements:
+**Sound**, *adj.* Only proves true things: it's never wrong. We only need soundness for halting statements:
 \`S.Sound\`.
 
-**Turnstile**, *n.* The symbol ⊢, as in \`S ⊢ φ\`, "S proves φ". We write \`S.Provable φ\`.
+**Turnstile**, *n.* The symbol ⊢, as in \`S ⊢ s\`, "S proves s". We write \`S.Provable s\`.
 And ⊬ means "doesn't prove".
 
 **Universal Turing machine**, *n.* An interpreter.

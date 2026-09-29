@@ -114,6 +114,96 @@ Does it work the other way? Can a consistent system be *unsound*?
   Surprisingly, no. A false halting claim can hide forever if the system is too weak to *disprove* it.
 :::
 
+## Telling them apart: consistent, complete, sound 🧭
+
+These three words are easy to mix up, so let's put them side by side. Pick any halting statement `s` (say, "`p` halts on `x`"). A formal system either proves `s` or doesn't, and either proves its negation or doesn't. That gives four possible outcomes:
+
+@figure four-outcomes
+
+Each property rules out a different kind of failure:
+
+* **Consistent** rules out the "both" cell: the system never proves `s` *and* its negation. It's about the system agreeing **with itself**.
+* **Complete** rules out the "neither" cell: the system always proves one of the two. It's about **coverage**: every question gets an answer.
+* **Sound** rules out proving the **false** one. It's about the system agreeing **with reality**.
+
+::: unlock Consistent, complete, sound
+**Consistent:** never both. **Complete:** never neither. **Sound:** never wrong. Consistency and soundness limit what a system proves; completeness demands that it prove enough.
+:::
+
+A helpful picture is a student taking an exam of yes/no questions (the questions are statements; answering "yes" means proving the statement, "no" means proving its negation):
+
+* A **consistent** student never answers both "yes" and "no" to the same question.
+* A **complete** student answers every question.
+* A **sound** student never gives a wrong answer.
+
+::: question
+A student answers only the questions they're sure about, gets every one of those right, and leaves the rest blank. Which properties does this student have?
+- [x] Sound and consistent, but not complete
+  Right. Every answer is correct, so they're sound, and a correct student can't answer both "yes" and "no" (only one can be right), so they're consistent too. But the blanks mean they're not complete. This is what a good formal system looks like, according to Gödel: the blanks can't all be filled in.
+- [ ] Complete, but not sound
+  They left questions blank, so they're not complete. And every answer they gave was right, so they *are* sound.
+- [ ] All three
+  The blank questions are the problem: a complete student answers everything.
+:::
+
+::: question
+Another student answers every question, never gives two answers to the same question, but gets some wrong. Which properties?
+- [ ] Sound and complete
+  Some answers are wrong, so this student isn't sound.
+- [x] Complete and consistent, but not sound
+  Right. Answering everything makes them complete, and never answering both ways makes them consistent. But being consistent doesn't make you *correct*: this student is confidently wrong on some questions.
+- [ ] Only complete
+  They never give two answers to the same question, which is exactly what consistency means.
+:::
+
+::: question
+A system proves "`q` halts on `x`" *and* "`q` doesn't halt on `x`". Which property fails for sure?
+- [x] Consistency (and so soundness too, since one of the two claims must be false)
+  Right. That's the "both" cell. And a sound system can never land there, because one of the two statements is false.
+- [ ] Completeness
+  Completeness is about the "neither" cell. This system answered, twice!
+- [ ] Only soundness
+  Soundness does fail, but more obviously, the system contradicts itself. That's inconsistency.
+:::
+
+::: question
+For some program `q`, a system proves neither "`q` halts on `x`" nor "`q` doesn't halt on `x`". Which property fails?
+- [ ] Consistency
+  It hasn't proved anything about `q`, so it certainly hasn't proved two contradictory things.
+- [x] Completeness, and only completeness
+  Right. That's the "neither" cell: a question left blank. The system can still be perfectly consistent and sound. Gödel's theorem says every consistent, effective system that checks computations has a blank like this somewhere.
+- [ ] Soundness
+  It hasn't proved anything false about `q`. It hasn't proved anything about `q` at all.
+:::
+
+::: question
+A system proves "`q` halts on `x`", but `q` really loops on `x`, and the system never proves that `q` loops. Which property fails?
+- [x] Soundness, but it may still be consistent
+  Right. It proved a false statement, so it isn't sound. But it never proved the opposite, so it hasn't contradicted *itself*. Consistent but unsound: the confidently wrong student.
+- [ ] Consistency
+  Consistency would fail only if the system *also* proved "`q` loops on `x`", and it doesn't.
+- [ ] Completeness
+  It did answer the question about `q`. It just answered wrongly.
+:::
+
+::: question
+Which of these implications is true (for halting statements)?
+- [x] Sound implies consistent
+  Right. A sound system only proves true statements, and a statement and its negation can't both be true. So it never proves both. (We showed this above.)
+- [ ] Consistent implies sound
+  The confidently wrong student is consistent but not sound.
+- [ ] Complete implies consistent
+  The system that proves every statement is complete but wildly inconsistent.
+:::
+
+::: question
+Is it possible for a system to be consistent, complete, *and* sound?
+- [ ] No, never: that's what Gödel's theorem says
+  Look back at the chapter 1 examples, or at the "system" of all true halting statements.
+- [x] Yes, but not if it's also effective (and strong enough to talk about programs)
+  Right. Evens (chapter 1) is all three (it only ever proves true facts about evenness), but it's too weak to talk about programs. The "system" whose theorems are all the true halting statements is all three, but no program can check its proofs. Gödel's theorem is about the combination: a consistent, effective system that checks computations can't also be complete.
+:::
+
 ## Checking computations ✅
 
 One more property. Remember the halting asymmetry from chapter 4: if a program halts, its run is a finite, checkable record. Any reasonable formal system can turn that record into a proof:

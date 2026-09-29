@@ -1,5 +1,5 @@
 import { useState, type ComponentType } from 'react'
-import { Race, HypothesisMap, FixedPoints, LawvereFinite, Landscape, LandscapeFull, Dovetail } from './more'
+import { FourOutcomes, Race, HypothesisMap, FixedPoints, LawvereFinite, Landscape, LandscapeFull, Dovetail } from './more'
 
 /* ------------------------------------------------------------------ */
 /* Cantor's diagonal: click bits to change the table, watch diag move. */
@@ -305,5 +305,6 @@ export const figures: Record<string, ComponentType> = {
   landscape: Landscape,
   'landscape-full': LandscapeFull,
   dovetail: Dovetail,
+  'four-outcomes': FourOutcomes,
   'godel-loop': GodelLoop,
 }

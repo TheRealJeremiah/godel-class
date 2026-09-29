@@ -28,16 +28,20 @@ function Proof({ name, label }: { name: string; label: string }) {
   const [open, setOpen] = useState(false)
   return (
     <div className={`proof ${open ? 'open' : ''}`}>
-      <button className="proof-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>
-        <span className="check" aria-hidden>
+      <button className="disclosure" onClick={() => setOpen(!open)} aria-expanded={open}>
+        <span className="disc-icon check" aria-hidden>
           ✓
         </span>
-        {open ? 'Hide the Lean proof' : label}
-        <span className="chev" aria-hidden>
-          ▸
+        <span className="disc-label">{open ? 'Hide the Lean proof' : label}</span>
+        <span className="disc-hint" aria-hidden>
+          {open ? 'Hide ▴' : 'Show ▾'}
         </span>
       </button>
-      {open && <Snippet name={name} />}
+      {open && (
+        <div className="disc-body">
+          <Snippet name={name} />
+        </div>
+      )}
     </div>
   )
 }
@@ -46,14 +50,17 @@ function Aside({ title, body }: { title: string; body: Block[] }) {
   const [open, setOpen] = useState(false)
   return (
     <div className={`aside ${open ? 'open' : ''}`}>
-      <button className="aside-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>
-        <span className="chev" aria-hidden>
-          ▸
+      <button className="disclosure" onClick={() => setOpen(!open)} aria-expanded={open}>
+        <span className="disc-icon" aria-hidden>
+          {open ? '−' : '+'}
         </span>
-        {title}
+        <span className="disc-label">{title}</span>
+        <span className="disc-hint" aria-hidden>
+          {open ? 'Hide ▴' : 'Read more ▾'}
+        </span>
       </button>
       {open && (
-        <div className="aside-body">
+        <div className="disc-body">
           <Blocks blocks={body} />
         </div>
       )}
