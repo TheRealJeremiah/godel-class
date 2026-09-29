@@ -24,6 +24,12 @@ Build a single self-contained file (open `dist/index.html` directly, or host it 
 npm run build
 ```
 
+## Deploy
+
+Pushing to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), which checks
+the content, re-checks every Lean proof, builds the site, and publishes it to GitHub Pages. One-time
+setup: in the GitHub repository, go to **Settings → Pages** and set **Source** to **GitHub Actions**.
+
 ## Check the proofs
 
 The Lean project needs only Lean 4 (toolchain pinned in `lean/lean-toolchain`), no Mathlib:
