@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "check:lean": "cd lean && lake build",
-    "check:content": "tsx scripts/check-content.ts"
+    "check:content": "tsx scripts/check-content.ts",
+    "check:exercises": "tsx scripts/test-exercises.ts"
   },
   "dependencies": {
     "marked": "^18.0.14",

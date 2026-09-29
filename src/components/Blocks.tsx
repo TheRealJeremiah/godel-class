@@ -3,6 +3,7 @@ import type { Block } from '../lib/parse'
 import { highlight, renderMarkdown } from '../lib/highlight'
 import { snippets } from '../lib/course'
 import { figures } from '../figures'
+import { Exercise } from './Exercise'
 
 export function Markdown({ src, className }: { src: string; className?: string }) {
   return <div className={className ?? 'md'} dangerouslySetInnerHTML={{ __html: renderMarkdown(src) }} />
@@ -101,6 +102,8 @@ export function Blocks({ blocks }: { blocks: Block[] }) {
           }
           case 'aside':
             return <Aside key={i} title={b.title} body={b.body} />
+          case 'exercise':
+            return <Exercise key={i} b={b} />
           case 'unlock':
             return (
               <div key={i} className="unlock">

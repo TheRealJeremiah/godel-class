@@ -6,6 +6,7 @@ import { sounds } from '../lib/sound'
 import { Blocks } from './Blocks'
 import { Question } from './Question'
 import { TopBar } from './TopBar'
+import { ChapterContext } from '../lib/chapterContext'
 
 type Gate = Extract<Block, { kind: 'continue' | 'question' }>
 
@@ -41,7 +42,7 @@ export function ChapterView({ chapter }: { chapter: Chapter }) {
   // When a gate is passed, glide down to the newly revealed content.
   useEffect(() => {
     if (passed > lastPassed.current) {
-      const el = document.getElementById(`seg-${passed}`)
+      const el = document.getElementById(passed === chapter.gateCount ? 'chapter-end' : `seg-${passed}`)
       if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }))
       if (passed === chapter.gateCount) sounds.fanfare()
     }
@@ -66,9 +67,12 @@ export function ChapterView({ chapter }: { chapter: Chapter }) {
   const questions = segs.filter((s) => s.gate?.kind === 'question').map((s) => s.gate!.gate)
   const answered = questions.filter((g) => progress.answers[g])
   const firstTry = answered.filter((g) => progress.answers[g].firstTry).length
+  const tail = segs[segs.length - 1]
+  const exerciseIds = tail.blocks.filter((b) => b.kind === 'exercise').map((b) => (b as { id: string }).id)
+  const exercisesSolved = exerciseIds.filter((id) => progress.exercises?.[id]?.solved).length
 
   return (
-    <>
+    <ChapterContext.Provider value={{ chapterId: chapter.id, chapterNum: idx + 1 }}>
       <TopBar
         progress={{ done: passed, total: chapter.gateCount }}
         headings={headings.map((h) => ({ text: h.text, slug: h.slug }))}
@@ -84,7 +88,7 @@ export function ChapterView({ chapter }: { chapter: Chapter }) {
           <p className="subtitle">{chapter.subtitle}</p>
         </header>
 
-        {visible.map((seg, i) => (
+        {visible.map((seg, i) => (seg.gate === null && finished ? null :
           <section key={i} id={`seg-${i}`} className={`segment ${i > 0 ? 'revealed' : ''}`}>
             <Blocks blocks={seg.blocks} />
             {seg.gate?.kind === 'continue' && (
@@ -122,7 +126,7 @@ export function ChapterView({ chapter }: { chapter: Chapter }) {
         ))}
 
         {finished && (
-          <section className="chapter-end">
+          <section className="chapter-end" id="chapter-end">
             <div className="done-card">
               <div className="done-emoji">🎉</div>
               <h2>Chapter complete!</h2>
@@ -130,6 +134,13 @@ export function ChapterView({ chapter }: { chapter: Chapter }) {
                 <p>
                   You got <strong>{firstTry}</strong> of <strong>{questions.length}</strong> questions right
                   on the first try.
+                </p>
+              )}
+              {exerciseIds.length > 0 && (
+                <p>
+                  Practice: <strong>{exercisesSolved}</strong> of <strong>{exerciseIds.length}</strong>{' '}
+                  {exerciseIds.length === 1 ? 'exercise' : 'exercises'} solved{' '}
+                  {exercisesSolved < exerciseIds.length && '(optional, below)'}
                 </p>
               )}
               <button
@@ -141,6 +152,11 @@ export function ChapterView({ chapter }: { chapter: Chapter }) {
                 Reset this chapter
               </button>
             </div>
+            {tail && tail.blocks.length > 0 && (
+              <section className="segment tail" id={`seg-${segs.length - 1}`}>
+                <Blocks blocks={tail.blocks} />
+              </section>
+            )}
             {next ? (
               <a className="next-card" href={`#/c/${next.id}`}>
                 <div className="next-label">Next up · Chapter {idx + 2}</div>
@@ -161,6 +177,6 @@ export function ChapterView({ chapter }: { chapter: Chapter }) {
           </section>
         )}
       </main>
-    </>
+    </ChapterContext.Provider>
   )
 }

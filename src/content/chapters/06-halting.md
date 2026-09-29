@@ -213,3 +213,31 @@ Halting is recognizable (just run the program), but not decidable (Turing). So b
 :::
 
 [[On to formal systems]]
+
+## Exercises ✏️
+
+Optional practice problems, like the ones at the end of a textbook chapter. They're graded as you go, but they don't block your progress.
+
+::: exercise troll Troll any halting tester
+Write Turing's troll as a program. Here programs are generator functions, and `d(p, x)` is a would-be halting tester that predicts whether program `p` halts on input `x`. Your troll, run on itself, must do the opposite of whatever `d` predicts. It will be tested against several different testers.
+--- hint
+The troll asks `d` about its own input run on itself: `d(x, x)`. Then it does the opposite.
+--- hint
+To loop forever in a generator, write `while (true) yield`. To halt, just reach the end of the function.
+--- solution
+```js
+function* troll(x) {
+  if (d(x, x)) while (true) yield   // d says "x halts on x": loop forever
+}                                   // d says "x loops on x": halt
+```
+
+Run on itself, the troll halts exactly when `d` says it doesn't. Whatever strategy `d` uses, it's wrong about this one program.
+:::
+
+::: exercise halting-order Prove the halting problem
+Put together Turing's proof that no program decides halting. Two of the steps don't belong.
+--- hint
+Build the troll from `d`, run it on itself, and look at both cases.
+--- solution
+The two cases can come in either order. The red herrings: waiting to see whether `t` halts might take forever, and a patched `d` is just a new program with its own troll.
+:::

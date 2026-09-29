@@ -243,3 +243,47 @@ Gödel's sentence swaps "false" for "not provable". Why isn't that a paradox too
 :::
 
 [[On to Cantor!]]
+
+## Exercises ✏️
+
+Optional practice problems, like the ones at the end of a textbook chapter. They're graded as you go, but they don't block your progress.
+
+::: exercise evens-checker Write the Evens checker
+Write `check(proof)`, the proof checker for the Evens system from this chapter. A proof is an array of statements (strings). Return the statement it proves, or `null` if it isn't a valid proof.
+--- hint
+To check a line against the rules, pull out its number and its kind. For example, `line.match(/^(\d+) is (even|not even)$/)` gives you both, or `null` if the line isn't a statement at all.
+--- hint
+A line is fine if it's an axiom, or if some earlier line has the same kind and a number exactly 2 smaller. If every line is fine, return the last one.
+--- solution
+```js
+const axioms = ["0 is even", "1 is not even"]
+
+function check(proof) {
+  if (proof.length === 0) return null
+  const parse = (line) => {
+    const m = line.match(/^(\d+) is (even|not even)$/)
+    return m && { n: Number(m[1]), kind: m[2] }
+  }
+  for (let i = 0; i < proof.length; i++) {
+    if (axioms.includes(proof[i])) continue
+    const cur = parse(proof[i])
+    const follows = cur && proof.slice(0, i).some((prev) => {
+      const p = parse(prev)
+      return p && p.kind === cur.kind && p.n + 2 === cur.n
+    })
+    if (!follows) return null
+  }
+  return proof[proof.length - 1]
+}
+```
+
+The checker only compares strings and numbers. It never needs to know whether a statement is *true*.
+:::
+
+::: exercise liar-order Prove the liar lemma
+Put together a proof that no statement `P` is equivalent to its own negation. Click steps to add them in order. Two of the steps don't belong.
+--- hint
+The proof has two halves. First show that "`P` is true" leads to a contradiction. Then show that "`P` is false" does too.
+--- solution
+The proof tries `P`, finds that it forces `¬P`, and concludes that `P` is false. Then `¬P` forces `P` straight back. The red herrings fail because the equivalence alone doesn't say which side is true, and `P` is an arbitrary statement, not something you can compute.
+:::

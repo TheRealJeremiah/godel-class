@@ -7,9 +7,22 @@ export interface Answer {
   firstTry: boolean
 }
 
+/** State of one optional exercise. */
+export interface ExerciseState {
+  solved: boolean
+  attempts: number
+  hintsShown: number
+  solutionShown: boolean
+  /** Seed for randomized exercises, so a reload shows the same problem. */
+  seed?: number
+  /** Unsubmitted work, e.g. code typed into an editor. */
+  draft?: string
+}
+
 export interface ChapterProgress {
   passed: number
   answers: Record<number, Answer>
+  exercises?: Record<string, ExerciseState>
 }
 
 const KEY = 'unprovable:v2:'
@@ -42,6 +55,14 @@ export function setProgress(id: string, p: ChapterProgress): void {
     /* ignore */
   }
   listeners.forEach((l) => l())
+}
+
+export const emptyExercise: ExerciseState = { solved: false, attempts: 0, hintsShown: 0, solutionShown: false }
+
+export function updateExercise(chapterId: string, exId: string, patch: Partial<ExerciseState>): void {
+  const p = read(chapterId)
+  const cur = p.exercises?.[exId] ?? emptyExercise
+  setProgress(chapterId, { ...p, exercises: { ...p.exercises, [exId]: { ...cur, ...patch } } })
 }
 
 export function resetProgress(id: string): void {

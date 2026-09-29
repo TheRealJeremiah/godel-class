@@ -332,3 +332,40 @@ If proofs can be checked by a program that always finishes, then a program can s
 :::
 
 [[Put the pieces together]]
+
+## Exercises ✏️
+
+Optional practice problems, like the ones at the end of a textbook chapter. They're graded as you go, but they don't block your progress.
+
+::: exercise classify-systems Consistent, complete, or sound?
+Write three functions that classify a formal system in a tiny world of four programs. A system is described by the list of statements it proves. The tests try systems with many different combinations of the three properties.
+--- hint
+**Consistent:** for no program `p` does it prove both `p + " halts"` and `p + " loops"`. **Complete:** for every program it proves at least one. **Sound:** for every statement it proves, the claim matches `reallyHalts`.
+--- solution
+```js
+function consistent(proved) {
+  return !programs.some((p) => proved.includes(p + " halts") && proved.includes(p + " loops"))
+}
+
+function complete(proved) {
+  return programs.every((p) => proved.includes(p + " halts") || proved.includes(p + " loops"))
+}
+
+function sound(proved) {
+  return proved.every((s) => {
+    const [p, claim] = s.split(" ")
+    return (claim === "halts") === reallyHalts(p)
+  })
+}
+```
+
+Consistent: never both. Complete: never neither. Sound: never wrong.
+:::
+
+::: exercise sound-consistent-order Prove that sound implies consistent
+Prove that a sound system never proves both "`p` halts on `x`" and its negation. Two of the steps don't belong.
+--- hint
+Suppose it proves both, and apply soundness to each one.
+--- solution
+The two uses of soundness can come in either order. The red herrings: completeness isn't needed, and consistency doesn't imply soundness (it's the other way round).
+:::

@@ -133,3 +133,32 @@ Which chapter-6 abilities of the computer does this proof rely on, through "loop
 In the next chapter, we'll build Gödel's sentence explicitly, and weaken "sound" to "consistent".
 
 [[Show me Gödel's sentence]]
+
+## Exercises ✏️
+
+Optional practice problems, like the ones at the end of a textbook chapter. They're graded as you go, but they don't block your progress.
+
+::: exercise complete-decider If a system were complete...
+`theorems()` lists every theorem of a (pretend) sound, complete formal system that knows about ten programs. Use it to write `decideHalts(p)`, which must always halt with the right answer.
+--- hint
+Search the theorems for **either** answer about `p`. Because the system is complete, one of them will turn up; because it's sound, it's the right one.
+--- solution
+```js
+function decideHalts(p) {
+  for (const t of theorems()) {
+    if (t === p + " halts") return true
+    if (t === p + " loops") return false
+  }
+}
+```
+
+That's why no real system can be sound, effective and complete: this search would decide halting, which chapter 6 says is impossible.
+:::
+
+::: exercise take-one-order Prove incompleteness, take one
+Put together this chapter's proof: no system is sound, effective and complete. Two of the steps don't belong.
+--- hint
+Show that `findLoopProof` would recognize looping: it halts on `x` exactly when `x` loops on `x`. You need one direction from soundness, and the other from soundness plus completeness.
+--- solution
+The three facts about `findLoopProof`, soundness, and completeness can come in any order before the conclusion that it recognizes looping. The red herrings: proving true halting statements isn't completeness, and running `x` on `x` might take forever.
+:::

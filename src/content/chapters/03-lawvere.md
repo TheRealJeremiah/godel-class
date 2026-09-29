@@ -252,3 +252,34 @@ Suppose some program could compute this table's entries. Then we could write a p
 To make this precise, we first need to say exactly what programs, halting, and "computing" a property mean. That's the next two chapters.
 
 [[On to programs]]
+
+## Exercises ✏️
+
+Optional practice problems, like the ones at the end of a textbook chapter. They're graded as you go, but they don't block your progress.
+
+::: exercise lawvere-order Rebuild Lawvere's proof
+Put together a proof of Lawvere's theorem: **if a table `e` has every row, then `f` has a fixed point.** Click steps to add them in order. Two of the available steps don't belong in this proof. Any order in which every step is justified by the steps before it will be accepted.
+--- hint
+A step can only use facts that come *before* it. Which steps don't depend on anything at all?
+--- hint
+The row `d` has to be defined before you can find it in the table, and you have to find it (as row `a`) before you can look at its diagonal entry `e(a)(a)`.
+--- solution
+One valid proof:
+
+1. Suppose the table `e` has every row.
+2. Define `d(x) = f(e(x)(x))`.
+3. Because the table has every row, `d` is row `a` for some label `a`.
+4. The diagonal entry of row `a`: `e(a)(a) = d(a)`, because row `a` is `d`.
+5. By the definition of `d`, `d(a) = f(e(a)(a))`.
+6. So `f(e(a)(a)) = e(a)(a)`: a fixed point.
+
+Steps 1 and 2 can be swapped, and step 5 (unfolding `d` at `a`) can go anywhere after `d` is defined, as long as it's before the conclusion. That gives 7 valid orders in all. The two red herrings: looking at column 0 relates two different entries, and "`f` has no fixed point" is the Cantor direction, not this one.
+:::
+
+::: exercise russell-order Prove Russell's paradox
+Show that not every property can define a set. This is Lawvere's argument with "not" as the function without a fixed point. Two of the steps don't belong.
+--- hint
+Follow Lawvere's recipe: take the diagonal ("`x` is a member of `x`"), flip it with "not", find its row (the set `R`), and look at the diagonal entry for `R`.
+--- solution
+The flipped property "`x` is not a member of itself" defines a set `R` (by the assumption), and asking whether `R ∈ R` gives a liar. The unflipped property leads nowhere, and `R` doesn't contain every set.
+:::

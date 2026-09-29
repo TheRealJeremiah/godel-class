@@ -36,7 +36,8 @@ The Lean project needs only Lean 4 (toolchain pinned in `lean/lean-toolchain`), 
 
 ```bash
 npm run check:lean     # = cd lean && lake build
-npm run check:content  # every chapter parses, every snippet/figure exists
+npm run check:content    # every chapter parses, every snippet/figure/exercise exists
+npm run check:exercises  # every coding exercise's worked solution passes its tests
 ```
 
 ## Layout

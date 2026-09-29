@@ -176,3 +176,15 @@ Last question! In one sentence, why is every consistent, effective formal system
 * Try [Busy Beavers!](https://busy-beavers.tigyog.app/), the interactive computability course that inspired this one.
 
 [[Finish the course! 🐍]]
+
+## Exercises ✏️
+
+Optional practice problems, like the ones at the end of a textbook chapter. They're graded as you go, but they don't block your progress.
+
+::: exercise big-picture-order The whole course in one proof
+Put the course's main steps in order, from the halting problem to incompleteness. Two of the steps don't belong.
+--- hint
+There are two threads: one about programs (halting, Post's theorem, looping) and one about proofs (searching them). They meet in the last step.
+--- solution
+Many orders work, since the programs thread and the proofs thread are independent until the end. The red herrings: Gödel's theorems assume consistency rather than finding a contradiction, and every statement about halting is true or false; the system just can't prove which.
+:::

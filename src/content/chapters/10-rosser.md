@@ -168,3 +168,33 @@ Look at the table. Which theorems make the weakest assumptions about the formal 
 All of our theorems *assume* the system is consistent. One question remains: can a system at least prove that about itself?
 
 [[Can a system prove it's consistent?]]
+
+## Exercises ✏️
+
+Optional practice problems, like the ones at the end of a textbook chapter. They're graded as you go, but they don't block your progress.
+
+::: exercise rosser-program Write Rosser's program
+Write `rosser(x)`: race a search for a proof against a search for a disproof, and do the opposite of whichever `S` finds first.
+--- hint
+This is the racing decider from chapter 5, with the answers swapped: a disproof found first means return `true`.
+--- solution
+```js
+function rosser(x) {
+  const yes = findYes(x), no = findNo(x)
+  while (true) {
+    if (no.next().done) return true    // S disproved it first: say true
+    if (yes.next().done) return false  // S proved it first: say false
+  }
+}
+```
+
+Whichever way `S` commits, Rosser's program does the opposite, with a run that `S` can check.
+:::
+
+::: exercise rosser-order Prove Rosser's theorem
+Put together Rosser's proof that a consistent system can neither prove nor disprove Rosser's sentence. Two of the steps don't belong.
+--- hint
+There are two cases, "`S` proves it" and "`S` disproves it". Each uses consistency to rule out the other search, then gets a contradiction.
+--- solution
+The two cases can be handled in either order (or even interleaved), so several orders work. The red herrings: Rosser's theorem doesn't assume soundness, and nothing lets `S` prove that a program loops.
+:::

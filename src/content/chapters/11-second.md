@@ -157,3 +157,23 @@ In the proof of the second theorem, which earlier result does the real work?
 :::
 
 [[One last chapter]]
+
+## Exercises ✏️
+
+Optional practice problems, like the ones at the end of a textbook chapter. They're graded as you go, but they don't block your progress.
+
+::: exercise second-order Prove the second incompleteness theorem
+Put together the proof that a consistent system can't prove its own consistency. Two of the steps don't belong.
+--- hint
+Suppose `S` proves `Con`. What does modus ponens give you, and why is that impossible?
+--- solution
+Every step depends on the one before. The red herrings: an inconsistent system proves `Con` too, so proving it shows nothing, and `Con` is true (if `S` is consistent), just unprovable.
+:::
+
+::: exercise not-con-order Prove that S + ¬Con is consistent
+Show that adding the false axiom "`S` is inconsistent" to a consistent `S` doesn't create a contradiction. Two of the steps don't belong.
+--- hint
+A new axiom only causes a contradiction if the system could already disprove it. What would disproving `¬Con` mean?
+--- solution
+The second theorem and the fact about adding axioms can come in either order. The red herrings: a false axiom isn't automatically contradictory, and the new system proves `¬Con`, not its own consistency.
+:::

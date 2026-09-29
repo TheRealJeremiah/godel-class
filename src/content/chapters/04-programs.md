@@ -198,3 +198,35 @@ If we prove a theorem about every computer that has certain abilities, which lan
 :::
 
 [[On to deciding and recognizing]]
+
+## Exercises ✏️
+
+Optional practice problems, like the ones at the end of a textbook chapter. They're graded as you go, but they don't block your progress.
+
+::: exercise finite-halts Decide halting for a small machine
+The halting problem says no program can decide halting in general. But for a machine with only finitely many states, you can! Write `halts(f, s)` for machines with states 0 to 99, where state 0 means "halted". It must always return an answer.
+--- hint
+Running the machine until it reaches 0 won't work: some machines never do. But there are only 100 states. What must have happened if a run lasts longer than that?
+--- hint
+If the machine hasn't reached 0 after 100 steps, it has visited some state twice. From then on it repeats the same cycle forever.
+--- solution
+```js
+function halts(f, s) {
+  for (let step = 0; step <= 100; step++) {
+    if (s === 0) return true
+    s = f(s)
+  }
+  return false   // no halt in 100 steps: a state repeated, so it cycles forever
+}
+```
+
+Keeping a `Set` of visited states and stopping at the first repeat works too. The halting problem is only unsolvable for programs with **unbounded** memory, like real programs; a finite machine can always be checked this way.
+:::
+
+::: exercise invariant-order Prove that a machine loops
+Prove that the machine `n => n + 1`, started at 5, never halts. Two of the steps don't belong.
+--- hint
+State the invariant first, prove it by induction (base case and inductive step), then use it.
+--- solution
+The base case and the inductive step can come in either order, but both must come before "by induction". The red herrings: running the machine can only show it hasn't halted *yet*, and "always exactly 5" isn't an invariant of `n => n + 1`.
+:::

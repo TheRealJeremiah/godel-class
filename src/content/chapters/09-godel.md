@@ -255,3 +255,32 @@ Lean can report which axioms each theorem relies on. For Gödel's theorem above,
 :::
 
 [[I am (not) convinced]]
+
+## Exercises ✏️
+
+Optional practice problems, like the ones at the end of a textbook chapter. They're graded as you go, but they don't block your progress.
+
+::: exercise godel-program Write Gödel's program
+Write Gödel's program `g` as a generator: it searches the theorems of a consistent system for a proof that its input loops on itself, and halts if it finds one. The tests include running `g` on itself.
+--- hint
+Loop over `theorems()`. For each one, check whether it equals `"¬ halts(" + x + ", " + x + ")"`: if so, `return`; if not, `yield` (one step) and keep going.
+--- solution
+```js
+function* g(x) {
+  for (const t of theorems()) {
+    if (t === "¬ halts(" + x + ", " + x + ")") return   // found a proof: halt
+    yield                                               // one step per theorem
+  }
+}
+```
+
+`g("g")` runs forever, because a consistent system never proves "¬ halts(g, g)". So that statement is true and unprovable: Gödel's sentence.
+:::
+
+::: exercise godel-order Prove Gödel's first theorem
+Put together the proof, assuming only that `S` is consistent, effective, and checks computations. Two of the steps don't belong.
+--- hint
+Suppose `S` proves G. Use the key fact, then "checks computations", to make `S` prove G's negation too.
+--- solution
+Every step depends on the one before, so there's just one valid order. The red herrings: this version doesn't assume soundness, and G being true doesn't make it provable.
+:::

@@ -13,6 +13,11 @@
  *   :::
  *   ::: aside Title  / ::: unlock Title / ::: note / ::: theorem Title
  *                                   (containers, closed by :::)
+ *   ::: exercise id Title           an optional, graded exercise (see src/exercises):
+ *   Prompt markdown ...
+ *   --- hint                          any number of hints, revealed one at a time
+ *   --- solution                      a worked solution
+ *   :::
  */
 
 export type Block =
@@ -27,6 +32,15 @@ export type Block =
   | { kind: 'theorem'; title: string; body: Block[] }
   | { kind: 'continue'; label: string; gate: number }
   | { kind: 'question'; prompt: Block[]; options: Option[]; gate: number }
+  | {
+      kind: 'exercise'
+      id: string
+      title: string
+      num: number
+      prompt: Block[]
+      hints: Block[][]
+      solution: Block[]
+    }
 
 export type Verdict = 'correct' | 'wrong' | 'neutral'
 
@@ -70,6 +84,7 @@ function parseFrontmatter(src: string): { meta: Record<string, string>; body: st
 
 interface Ctx {
   gate: number
+  exercise: number
   allowGates: boolean
   where: string
 }
@@ -120,13 +135,15 @@ function parseBlocks(lines: string[], ctx: Ctx): Block[] {
       const body: string[] = []
       i++
       let inFence = false
+      let depth = 1 // containers can nest, e.g. an aside inside an exercise
       while (i < lines.length) {
         if (/^\s*```/.test(lines[i])) inFence = !inFence
-        if (!inFence && /^:::\s*$/.test(lines[i])) break
+        if (!inFence && /^:::\s*\w/.test(lines[i])) depth++
+        if (!inFence && /^:::\s*$/.test(lines[i]) && --depth === 0) break
         body.push(lines[i++])
       }
       if (i >= lines.length) throw new Error(`${ctx.where}: unclosed ::: ${type}`)
-      const inner: Ctx = { gate: 0, allowGates: false, where: ctx.where }
+      const inner: Ctx = { gate: 0, exercise: 0, allowGates: false, where: ctx.where }
       if (type === 'question') {
         if (!ctx.allowGates) throw new Error(`${ctx.where}: question inside a container`)
         blocks.push(parseQuestion(body, ctx.gate++, ctx.where))
@@ -136,6 +153,11 @@ function parseBlocks(lines: string[], ctx: Ctx): Block[] {
         blocks.push({ kind: 'unlock', title, body: parseBlocks(body, inner) })
       } else if (type === 'note') {
         blocks.push({ kind: 'note', body: parseBlocks(body, inner) })
+      } else if (type === 'exercise') {
+        if (!ctx.allowGates) throw new Error(`${ctx.where}: exercise inside a container`)
+        const [id, ...rest] = title.split(/\s+/)
+        if (!id) throw new Error(`${ctx.where}: exercise needs an id`)
+        blocks.push(parseExercise(body, id, rest.join(' '), ++ctx.exercise, inner))
       } else if (type === 'theorem') {
         blocks.push({ kind: 'theorem', title, body: parseBlocks(body, inner) })
       } else {
@@ -148,6 +170,30 @@ function parseBlocks(lines: string[], ctx: Ctx): Block[] {
   }
   flush()
   return blocks
+}
+
+function parseExercise(lines: string[], id: string, title: string, num: number, ctx: Ctx): Block {
+  const parts: { kind: 'prompt' | 'hint' | 'solution'; lines: string[] }[] = [{ kind: 'prompt', lines: [] }]
+  let inFence = false
+  for (const line of lines) {
+    if (/^\s*```/.test(line)) inFence = !inFence
+    const m = !inFence && line.match(/^---\s*(hint|solution)\s*$/)
+    if (m) parts.push({ kind: m[1] as 'hint' | 'solution', lines: [] })
+    else parts[parts.length - 1].lines.push(line)
+  }
+  const where = `${ctx.where} (exercise ${id})`
+  const inner: Ctx = { ...ctx, where }
+  const solutions = parts.filter((p) => p.kind === 'solution')
+  if (solutions.length !== 1) throw new Error(`${where}: needs exactly one --- solution`)
+  return {
+    kind: 'exercise',
+    id,
+    title: title || 'Exercise',
+    num,
+    prompt: parseBlocks(parts[0].lines, inner),
+    hints: parts.filter((p) => p.kind === 'hint').map((p) => parseBlocks(p.lines, inner)),
+    solution: parseBlocks(solutions[0].lines, inner),
+  }
 }
 
 function parseQuestion(lines: string[], gate: number, where: string): Block {
@@ -169,7 +215,7 @@ function parseQuestion(lines: string[], gate: number, where: string): Block {
   const w = `${where} (question #${gate + 1})`
   if (options.length < 2) throw new Error(`${w}: needs at least two options`)
   if (!options.some((o) => o.verdict !== 'wrong')) throw new Error(`${w}: no correct option`)
-  const inner: Ctx = { gate: 0, allowGates: false, where: w }
+  const inner: Ctx = { gate: 0, exercise: 0, allowGates: false, where: w }
   return {
     kind: 'question',
     gate,
@@ -187,7 +233,7 @@ export function parseChapter(src: string, where = 'chapter'): Chapter {
   for (const k of ['id', 'title', 'subtitle', 'emoji', 'blurb']) {
     if (!meta[k]) throw new Error(`${where}: frontmatter is missing "${k}"`)
   }
-  const ctx: Ctx = { gate: 0, allowGates: true, where: meta.id }
+  const ctx: Ctx = { gate: 0, exercise: 0, allowGates: true, where: meta.id }
   const blocks = parseBlocks(body.split('\n'), ctx)
   return {
     id: meta.id,
@@ -206,6 +252,11 @@ export function* walk(blocks: Block[]): Generator<Block> {
     yield b
     if (b.kind === 'aside' || b.kind === 'unlock' || b.kind === 'note' || b.kind === 'theorem')
       yield* walk(b.body)
+    if (b.kind === 'exercise') {
+      yield* walk(b.prompt)
+      for (const h of b.hints) yield* walk(h)
+      yield* walk(b.solution)
+    }
     if (b.kind === 'question') {
       yield* walk(b.prompt)
       for (const o of b.options) yield* walk(o.feedback)

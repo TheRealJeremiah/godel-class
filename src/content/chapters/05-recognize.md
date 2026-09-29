@@ -263,3 +263,88 @@ We saw that "`s` is provable in Evens" is recognizable (search for a proof). Wha
 :::
 
 [[On to the halting problem!]]
+
+## Exercises ✏️
+
+Optional practice problems, like the ones at the end of a textbook chapter. They're graded as you go, but they don't block your progress.
+
+::: exercise race-decider Decide by racing
+Write `decide(r1, r2, x)`. You're given two recognizers: `r1` halts exactly on the inputs that have some property `P`, and `r2` halts exactly on the inputs that don't. Your function must **always halt**, and return whether `x` has the property. The property is chosen at random each time you run the tests, so you can't just compute it: you have to use the recognizers.
+
+**What `r1(x)` and `.next()` return**
+
+* `r1(x)` returns a **run**: the program `r1`, started on input `x` and paused before its first step. You use it through one method, `.next()`. (The run itself has no `done` property.)
+* `run.next()` performs **one step** and returns an object `{ value, done }`:
+  * `done: false` means the program is still running;
+  * `done: true` means the program has halted;
+  * `value` is always `undefined`; you can ignore it.
+
+```js
+const run = r1(4);        // a run of r1 on input 4 (nothing has happened yet)
+const step = run.next();  // { value: undefined, done: false }
+step.done;                // false: still running
+```
+
+If `r1` never halts on `x`, every call to `run.next()` returns `done: false`. Each call to `r1(x)` starts a new run from the beginning. `r2` works exactly the same way.
+
+::: aside How is a recognizer like r1 written?
+In JavaScript, a paused run is called a **generator**. A generator function is written with `function*`, and every `yield` inside it marks the end of one step. For example, here's a recognizer for "`x` is even":
+
+```js
+function* evenRecognizer(x) {
+  if (x % 2 !== 0) while (true) yield;   // odd: run forever, one step at a time
+  for (let i = 0; i < x; i++) yield;     // even: take x steps, then halt
+}
+```
+
+`evenRecognizer(6)` halts after 6 steps: the seventh call to `.next()` returns `done: true`. `evenRecognizer(7)` never halts. The `r1` and `r2` in this exercise are written the same way, for a secret property. You can call `r1` and `r2` at the top level of your code and `console.log` what they do: the output appears under the editor.
+:::
+--- hint
+If you run `r1` until it finishes, you'll wait forever whenever `x` doesn't have the property. Never wait on just one of them.
+--- hint
+Start both runs, then take turns: one step of `r1`, one step of `r2`, and so on. Whichever halts first tells you the answer.
+--- solution
+```js
+function decide(r1, r2, x) {
+  const a = r1(x), b = r2(x);          // start both programs
+  while (true) {
+    if (a.next().done) return true;   // r1 halted: x has the property
+    if (b.next().done) return false;  // r2 halted: x doesn't
+  }
+}
+```
+
+This always halts because exactly one of the two recognizers halts on every input. It's the "if" direction of Post's theorem.
+:::
+
+::: exercise dovetail List by dovetailing
+Write a generator `list(r)` that lists every input on which the recognizer `r` halts. `r(x)` returns a paused run, exactly as in the previous exercise. Some inputs make `r` run forever, so you can't wait for one run to finish before starting the next.
+--- hint
+Keep an array of the runs you've started. Each round, start one new run (on the next input), then give every unfinished run one more step. Whenever a run finishes, `yield` its input.
+--- solution
+```js
+function* list(r) {
+  const runs = []                        // [input, run] pairs still running
+  for (let x = 0; ; x++) {
+    runs.push([x, r(x)])                 // start a new input each round
+    for (let i = runs.length - 1; i >= 0; i--) {
+      const [input, run] = runs[i]
+      if (run.next().done) {             // one more step for every started run
+        runs.splice(i, 1)
+        yield input
+      }
+    }
+  }
+}
+```
+
+A run that never halts just keeps taking one step per round, and never blocks the others. Every input that `r` halts on gets listed after finitely many rounds.
+:::
+
+::: exercise post-order Prove Post's theorem
+Prove the "if" direction of Post's theorem: if a property and its opposite are both recognizable, then the property is decidable. Two of the steps don't belong.
+--- hint
+Build the racing decider first. Then take any input and split into the two cases: it has the property, or it doesn't.
+--- solution
+The two cases can come in either order. The red herrings: running `r1` alone means waiting forever on no-instances, and `r1` and `r2` never both halt on the same input.
+:::

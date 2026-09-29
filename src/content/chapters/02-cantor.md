@@ -157,3 +157,31 @@ Given any table whose rows and columns are numbered the same way, flip the diago
 In the next chapter we'll zoom out and ask: what *exactly* made that argument work? The answer, discovered by William Lawvere in 1969, turns Cantor's trick into a general-purpose tool. With it, the liar, Cantor, Russell's paradox, the halting problem and Gödel's theorem all turn out to be the same argument in different costumes.
 
 [[Show me the general trick]]
+
+## Exercises ✏️
+
+Optional practice problems, like the ones at the end of a textbook chapter. They're graded as you go, but they don't block your progress.
+
+::: exercise not-in-list Escape the list
+Write `missing(table)`: given any infinite list of bit-streams, return a stream that isn't in it. (A stream is a function from positions to `true` or `false`.) Your function will be tried on several different tables.
+--- hint
+You need to disagree with row 0 somewhere, with row 1 somewhere, and so on forever. One position per row is enough, as long as each row gets its own position.
+--- hint
+Cantor's choice: disagree with row `n` at position `n`.
+--- solution
+```js
+function missing(table) {
+  return (n) => !table(n)(n)
+}
+```
+
+This is Cantor's `diag`. Other answers work too: `(n) => !table(n)(n + 1)` disagrees with row `n` at position `n + 1`. But flipping a single row, or returning a fixed stream, fails: some table contains it.
+:::
+
+::: exercise cantor-order Prove Cantor's theorem
+Put together a proof that no infinite list contains every bit-stream. Two of the steps don't belong.
+--- hint
+Build `diag` first, then suppose it's in the list as row `k`, and look at position `k` in two different ways.
+--- solution
+The two views of position `k` (step "since `diag` is row `k`" and step "by the definition of `diag`") can come in either order; together they say a bit equals its own flip. The red herrings: "infinite" doesn't mean "contains everything", and position 0 only rules out row 0.
+:::
